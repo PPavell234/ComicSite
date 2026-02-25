@@ -55,11 +55,11 @@
                     <div
                         class="flex items-center bg-[#D2D2D2] text-white py-1 px-3 mt-12 w-[600px] h-[45px] rounded-full">
                         <textarea v-model="textInput1" @input="updateCharacterCount1"
-                            class="w-full h-full bg-[#D2D2D2] text-white p-2 rounded-full resize-none outline-none"
+                            class="w-full h-full bg-[#D2D2D2] text-black p-2 rounded-full resize-none outline-none"
                             placeholder="Титульник(Название)*" maxlength="100"></textarea>
 
                         <!-- Количество символов -->
-                        <span class="text-sm text-white ml-2">{{ charCount1 }}/100</span>
+                        <span class="text-sm text-black ml-2">{{ charCount1 }}/100</span>
                     </div>
 
                     <!-- Текстовое поле 2 с отображением количества символов для первого поля -->
@@ -75,17 +75,26 @@
                         <textarea class="text-area bg-white text-black" placeholder="Про что-то бла бла бла"></textarea>
                     </div>
 
-                    <!-- Текстовое поле 2 с отображением количества символов для первого поля -->
+                    <!-- Текстовое поле с добавлением тегов -->
                     <div class="text-field-container mt-10">
                         <div class="text-field-header">
                             <!-- Иконка -->
                             <img src="/imagePage/headerMenu/info.svg" alt="Иконка" class="icon">
                             <!-- Название -->
-                            <span class="title title text-black">Теги</span>
+                            <span class="title text-black">Теги</span>
                         </div>
 
                         <!-- Текстовое поле -->
-                        <textarea class="text-area bg-white text-black" placeholder="Про что-то бла бла бла"></textarea>
+                        <textarea class="text-area text-black" placeholder="Введите теги, разделяя их пробелом"
+                            v-model="textInput" @keyup="addTagOnSpace"></textarea>
+
+                        <!-- Отображение тегов -->
+                        <div class="tags-container mt-4">
+                            <div v-for="(tag, index) in tags" :key="index" class="tag">
+                                <span>{{ tag }}</span>
+                                <button @click="removeTag(index)" class="close-btn">X</button>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
@@ -118,11 +127,37 @@ function updateCharacterCount2() {
     charCount2.value = textInput2.value.length
 }
 
-//Отображение
+//Создание тегов для поля с тегами
+// Состояние для текста в поле
+const textInput = ref('')
+// Состояние для списка тегов
+const tags = ref([])
+
+// Обновление тегов при вводе текста
+function addTagOnSpace(event) {
+    // Если нажата клавиша пробел
+    if (event.key === ' ' && textInput.value.trim()) {
+        // Добавляем тег, если текст не пустой и не содержит уже такой тег
+        const newTag = textInput.value.trim()
+        if (!tags.value.includes(newTag)) {
+            tags.value.push(newTag)
+        }
+        // Очищаем поле ввода после добавления тега
+        textInput.value = ''
+    }
+}
+
+// Удаление тега
+function removeTag(index) {
+    tags.value.splice(index, 1)
+}
+
 
 </script>
 
 <style scoped>
+/* Это для ввода 2 (описнаие) */
+
 .text-area::placeholder {
     color: #16181b;
 
@@ -163,5 +198,47 @@ function updateCharacterCount2() {
     border: 1px solid #777777;
     border-radius: 4px;
     resize: none;
+}
+
+/* Это для Тегов стиль */
+
+/* Стиль для текстового поля */
+.text-field-container {
+    width: 100%;
+    max-width: 600px;
+}
+
+.text-area {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #161616;
+    border-radius: 4px;
+    resize: none;
+}
+
+/* Стиль для тегов */
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.tag {
+    background-color: #6e6e6e;
+    border-radius: 12px;
+    padding: 5px 10px;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: rgb(8, 8, 8);
+    cursor: pointer;
+    margin-left: 8px;
 }
 </style>
