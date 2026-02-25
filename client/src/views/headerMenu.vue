@@ -45,8 +45,8 @@
         </div>
 
         <!-- Второй блок -->
-        <div class="bg-[#464343] min-h-screen ml-[117px] mr-[229px] mt-38">
-            <div class="flex flex-row ml-[73px] mr-[229px]">
+        <div class="bg-[#464343] min-h-screen ml-[200px] mr-[300px] mt-38">
+            <div class="flex flex-row ml-[60px] mr-[229px]">
                 <div class="mt-10">
                     <div class="bg-gray-500 w-[259px] h-[72px]"></div>
                     <h3 class="text-white mt-30">Загрузить комикс</h3>
@@ -97,7 +97,32 @@
                         </div>
                     </div>
 
+                    <!-- Текстовое поле с отображением количества символов для первого поля -->
+                    <div
+                        class="flex items-center bg-[#D2D2D2] text-white py-1 px-3 mt-12 w-[600px] h-[45px] rounded-full">
+                        <textarea v-model="textInput2" @input="updateCharacterCount2"
+                            class="w-full h-full bg-[#D2D2D2] text-black p-2 rounded-full resize-none outline-none"
+                            placeholder="Переводчик(Это перевод)//Или Свой комикс имя свое*" maxlength="100"></textarea>
+
+                        <!-- Количество символов -->
+                        <span class="text-sm text-black ml-2">{{ charCount2 }}/100</span>
+                    </div>
+
+                    <!-- Текстовое поле с отображением количества символов для первого поля -->
+                    <div
+                        class="flex items-center bg-[#D2D2D2] text-white py-1 px-3 mt-12 w-[600px] h-[45px] rounded-full">
+                        <textarea v-model="textInput3" @input="updateCharacterCount3"
+                            class="w-full h-full bg-[#D2D2D2] text-black p-2 rounded-full resize-none outline-none"
+                            placeholder="Художник(имя)*" maxlength="100"></textarea>
+
+                        <!-- Количество символов -->
+                        <span class="text-sm text-black ml-2">{{ charCount3 }}/100</span>
+                    </div>
+
                 </div>
+
+
+
             </div>
         </div>
     </div>
@@ -115,8 +140,11 @@ import { ref } from 'vue'
 const textInput1 = ref('')  // Для первого текстового поля
 const charCount1 = ref(0)   // Счётчик символов для первого текстового поля
 
-const textInput2 = ref('')  // Для второго текстового поля
-const charCount2 = ref(0)   // Счётчик символов для второго текстового поля
+const textInput2 = ref('')
+const charCount2 = ref(0)
+
+const textInput3 = ref('')
+const charCount3 = ref(0)
 
 function updateCharacterCount1() {
     charCount1.value = textInput1.value.length
@@ -125,6 +153,11 @@ function updateCharacterCount1() {
 function updateCharacterCount2() {
 
     charCount2.value = textInput2.value.length
+}
+
+function updateCharacterCount3() {
+
+    charCount3.value = textInput3.value.length
 }
 
 //Создание тегов для поля с тегами
