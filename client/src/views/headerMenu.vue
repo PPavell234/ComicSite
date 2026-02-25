@@ -45,35 +45,123 @@
         </div>
 
         <!-- Второй блок -->
-        <div class="bg-white min-h-screen ml-[117px] mr-[229px] mt-38">
+        <div class="bg-[#464343] min-h-screen ml-[117px] mr-[229px] mt-38">
             <div class="flex flex-row ml-[73px] mr-[229px]">
                 <div class="mt-10">
                     <div class="bg-gray-500 w-[259px] h-[72px]"></div>
-                    <h3 class="text-black mt-30">Загрузить комикс</h3>
+                    <h3 class="text-white mt-30">Загрузить комикс</h3>
 
-                    <!-- Текстовое поле с отображением количества символов -->
+                    <!-- Текстовое поле с отображением количества символов для первого поля -->
                     <div
-                        class="flex items-center bg-yellow-500 text-white py-1 px-3 mt-12 w-[600px] h-[45px] rounded-full">
-                        <textarea v-model="textInput" @input="updateCharacterCount"
-                            class="w-full h-full bg-yellow-500 text-white p-2 rounded-full resize-none outline-none"
+                        class="flex items-center bg-[#D2D2D2] text-white py-1 px-3 mt-12 w-[600px] h-[45px] rounded-full">
+                        <textarea v-model="textInput1" @input="updateCharacterCount1"
+                            class="w-full h-full bg-[#D2D2D2] text-white p-2 rounded-full resize-none outline-none"
                             placeholder="Титульник(Название)*" maxlength="100"></textarea>
 
                         <!-- Количество символов -->
-                        <span class="text-sm text-white ml-2">{{ charCount }}/100</span>
+                        <span class="text-sm text-white ml-2">{{ charCount1 }}/100</span>
                     </div>
+
+                    <!-- Текстовое поле 2 с отображением количества символов для первого поля -->
+                    <div class="text-field-container mt-10">
+                        <div class="text-field-header">
+                            <!-- Иконка -->
+                            <img src="/imagePage/headerMenu/info.svg" alt="Иконка" class="icon">
+                            <!-- Название -->
+                            <span class="title title text-black">Описание</span>
+                        </div>
+
+                        <!-- Текстовое поле -->
+                        <textarea class="text-area bg-white text-black" placeholder="Про что-то бла бла бла"></textarea>
+                    </div>
+
+                    <!-- Текстовое поле 2 с отображением количества символов для первого поля -->
+                    <div class="text-field-container mt-10">
+                        <div class="text-field-header">
+                            <!-- Иконка -->
+                            <img src="/imagePage/headerMenu/info.svg" alt="Иконка" class="icon">
+                            <!-- Название -->
+                            <span class="title title text-black">Теги</span>
+                        </div>
+
+                        <!-- Текстовое поле -->
+                        <textarea class="text-area bg-white text-black" placeholder="Про что-то бла бла бла"></textarea>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
+
 </template>
 
 <script setup>
+
+
+
 import { ref } from 'vue'
 
-const textInput = ref('')
-const charCount = ref(0)
+//Количетсво символов для 
 
-function updateCharacterCount() {
-    charCount.value = textInput.value.length
+const textInput1 = ref('')  // Для первого текстового поля
+const charCount1 = ref(0)   // Счётчик символов для первого текстового поля
+
+const textInput2 = ref('')  // Для второго текстового поля
+const charCount2 = ref(0)   // Счётчик символов для второго текстового поля
+
+function updateCharacterCount1() {
+    charCount1.value = textInput1.value.length
 }
+
+function updateCharacterCount2() {
+
+    charCount2.value = textInput2.value.length
+}
+
+//Отображение
+
 </script>
+
+<style scoped>
+.text-area::placeholder {
+    color: #16181b;
+
+    opacity: 1;
+}
+
+.text-field-container {
+    width: 600px;
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #ffffff;
+}
+
+.text-field-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+.title {
+    font-weight: bold;
+    font-size: 16px;
+    color: #020202;
+}
+
+.text-area {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #777777;
+    border-radius: 4px;
+    resize: none;
+}
+</style>
