@@ -46,49 +46,46 @@
 
         <!-- Второй блок -->
         <div class="bg-[#464343] min-h-screen ml-[200px] mr-[300px] mt-38">
-            <div class="flex flex-row ml-[60px] mr-[229px]">
+            <div class="flex flex-row ml-[60px] mr-[229px] gap-70">
+
+                <!-- ЛЕВАЯ КОЛОНКА (БЕЗ ИЗМЕНЕНИЙ) -->
                 <div class="mt-10">
+
                     <div class="bg-gray-500 w-[259px] h-[72px]"></div>
                     <h3 class="text-white mt-30">Загрузить комикс</h3>
 
-                    <!-- Текстовое поле с отображением количества символов для первого поля -->
+                    <!-- Титульник -->
                     <div
                         class="flex items-center bg-[#D2D2D2] text-white py-1 px-3 mt-12 w-[600px] h-[45px] rounded-full">
                         <textarea v-model="textInput1" @input="updateCharacterCount1"
                             class="w-full h-full bg-[#D2D2D2] text-black p-2 rounded-full resize-none outline-none"
                             placeholder="Титульник(Название)*" maxlength="100"></textarea>
 
-                        <!-- Количество символов -->
-                        <span class="text-sm text-black ml-2">{{ charCount1 }}/100</span>
+                        <span class="text-sm text-black ml-2">
+                            {{ charCount1 }}/100
+                        </span>
                     </div>
 
-                    <!-- Текстовое поле 2 с отображением количества символов для первого поля -->
+                    <!-- Описание -->
                     <div class="text-field-container mt-10">
                         <div class="text-field-header">
-                            <!-- Иконка -->
                             <img src="/imagePage/headerMenu/info.svg" alt="Иконка" class="icon">
-                            <!-- Название -->
                             <span class="title title text-black">Описание</span>
                         </div>
 
-                        <!-- Текстовое поле -->
                         <textarea class="text-area bg-white text-black" placeholder="Про что-то бла бла бла"></textarea>
                     </div>
 
-                    <!-- Текстовое поле с добавлением тегов -->
+                    <!-- Теги -->
                     <div class="text-field-container mt-10">
                         <div class="text-field-header">
-                            <!-- Иконка -->
                             <img src="/imagePage/headerMenu/info.svg" alt="Иконка" class="icon">
-                            <!-- Название -->
                             <span class="title text-black">Теги</span>
                         </div>
 
-                        <!-- Текстовое поле -->
                         <textarea class="text-area text-black" placeholder="Введите теги, разделяя их пробелом"
                             v-model="textInput" @keyup="addTagOnSpace"></textarea>
 
-                        <!-- Отображение тегов -->
                         <div class="tags-container mt-4">
                             <div v-for="(tag, index) in tags" :key="index" class="tag">
                                 <span>{{ tag }}</span>
@@ -97,35 +94,71 @@
                         </div>
                     </div>
 
-                    <!-- Текстовое поле с отображением количества символов для первого поля -->
+                    <!-- Переводчик -->
                     <div
                         class="flex items-center bg-[#D2D2D2] text-white py-1 px-3 mt-12 w-[600px] h-[45px] rounded-full">
                         <textarea v-model="textInput2" @input="updateCharacterCount2"
                             class="w-full h-full bg-[#D2D2D2] text-black p-2 rounded-full resize-none outline-none"
                             placeholder="Переводчик(Это перевод)//Или Свой комикс имя свое*" maxlength="100"></textarea>
 
-                        <!-- Количество символов -->
-                        <span class="text-sm text-black ml-2">{{ charCount2 }}/100</span>
+                        <span class="text-sm text-black ml-2">
+                            {{ charCount2 }}/100
+                        </span>
                     </div>
 
-                    <!-- Текстовое поле с отображением количества символов для первого поля -->
+                    <!-- Художник -->
                     <div
                         class="flex items-center bg-[#D2D2D2] text-white py-1 px-3 mt-12 w-[600px] h-[45px] rounded-full">
                         <textarea v-model="textInput3" @input="updateCharacterCount3"
                             class="w-full h-full bg-[#D2D2D2] text-black p-2 rounded-full resize-none outline-none"
                             placeholder="Художник(имя)*" maxlength="100"></textarea>
 
-                        <!-- Количество символов -->
-                        <span class="text-sm text-black ml-2">{{ charCount3 }}/100</span>
+                        <span class="text-sm text-black ml-2">
+                            {{ charCount3 }}/100
+                        </span>
+                    </div>
+
+                    <!-- Кнопка -->
+                    <div class="mt-12 flex justify-center">
+                        <button
+                            class="flex items-center bg-[#D2D2D2] text-white py-1 px-3 rounded-full hover:bg-yellow-300 hover:scale-105 transition-all">
+                            <img src="/imagePage/button-icon/upload-2-line.svg" alt="" class="w-4 h-4 mr-2">
+                            <p>Опубликовать</p>
+                        </button>
                     </div>
 
                 </div>
 
 
+                <!-- ПРАВАЯ КОЛОНКА -->
+                <div class="mt-80 w-[440px]">
+                    <div class="flex justify-left gap-3 relative -top-6 ">
+                        <img src="/imagePage/button-icon/upload-2-line.svg" alt="">
+                        <p>обложка</p>
+                    </div>
+
+                    <!-- Обложка -->
+                    <div class="bg-gray-600 w-full h-[660px] rounded-xl flex items-center justify-center">
+                        <p class="text-white">Обложка</p>
+                    </div>
+
+                    <!-- Название комикса -->
+                    <div class="mt-3">
+                        <p class="text-white text-xl font-semibold break-words">
+                            {{ textInput1 || 'Название комикса' }}
+                        </p>
+                    </div>
+
+                </div>
 
             </div>
         </div>
+
+
+
+
     </div>
+
 
 </template>
 
