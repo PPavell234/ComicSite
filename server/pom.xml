@@ -26,6 +26,14 @@
 
     <dependencies>
 
+        <!-- Для Распаовки комиксов -->
+            <dependency>
+        <groupId>com.github.junrar</groupId>
+        <artifactId>junrar</artifactId>
+        <version>7.5.4</version>
+    </dependency>
+
+
         <!-- Web (REST API) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
