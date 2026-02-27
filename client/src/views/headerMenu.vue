@@ -149,6 +149,20 @@
                         </p>
                     </div>
 
+                    <div
+                        class="bg-[#D2D2D2] w-full h-[120px] mt-3 rounded-xl flex flex-col items-center justify-center">
+
+                        <!-- Блок с иконкой и текстом -->
+                        <div class="flex flex-center items-center gap-3">
+                            <img src="/imagePage/button-icon/upload-2-line.svg" alt="">
+                            <p class="mt-2 text-sm text-gray-700">Загрузить обложку files</p>
+                        </div>
+
+                        <!-- Второй текст -->
+                        <p class="mt-2 text-sm text-gray-700">Drag and drop files here or click to upload</p>
+
+                    </div>
+
                 </div>
 
             </div>
