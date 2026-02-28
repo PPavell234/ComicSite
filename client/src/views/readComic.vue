@@ -1,51 +1,71 @@
 <template>
     <div class="app">
-        <h1>Загрузка PDF</h1>
+        <!-- Компонент ComicHeader -->
+        <ComicHeader :chapterTitle="chapterTitle" :currentPage="currentPage + 1" :totalPages="totalPages">
+            <!-- Контент вставляется в слот компонента -->
+            <template #content>
+                <!-- Загрузка PDF и отображение страниц -->
+                <div class="pdf-container">
+                    <!-- Индикатор загрузки -->
+                    <div v-if="loading" class="loading">
+                        Загрузка и обработка PDF... Подождите
+                    </div>
 
-        <!-- Индикатор загрузки -->
-        <div v-if="loading" class="loading">
-            Загрузка и обработка PDF... Подождите
-        </div>
+                    <!-- Выбор файла PDF -->
+                    <div class="file-input-container" v-if="!pages.length">
+                        <input type="file" @change="uploadPdf" accept=".pdf" :disabled="loading" id="pdf-upload" />
+                        <label for="pdf-upload" class="file-input-label">
+                            Выберите PDF файл
+                        </label>
+                    </div>
 
-        <!-- Выбор файла PDF -->
-        <input type="file" @change="uploadPdf" accept=".pdf" :disabled="loading" />
+                    <!-- Информация о файле -->
+                    <div v-if="fileInfo" class="file-info">
+                        <p>Файл: {{ fileInfo.filename }}</p>
+                    </div>
 
-        <!-- Информация о файле -->
-        <div v-if="fileInfo" class="file-info">
-            <p>Файл: {{ fileInfo.filename }}</p>
-            <p>Страниц: {{ fileInfo.totalPages }}</p>
-        </div>
+                    <!-- Отображение страницы PDF с областями для перелистывания -->
+                    <div v-if="pages.length" class="reader-container">
+                        <!-- Левая область для клика (предыдущая страница) -->
+                        <div class="nav-area left-area" @click="prevPage" :class="{ 'disabled': currentPage === 0 }">
+                        </div>
 
-        <!-- Отображение страниц PDF -->
-        <div v-if="pages.length" class="pages-container">
-            <div v-for="(page, index) in pages" :key="index" class="page-wrapper">
-                <p class="page-number">Страница {{ index + 1 }}</p>
-                <img :src="page" class="pdf-page" alt="PDF страница" />
-            </div>
-        </div>
+                        <!-- Текущая страница -->
+                        <img :src="pages[currentPage]" class="pdf-page" alt="PDF страница" />
 
-        <!-- Сообщение, если нет страниц -->
-        <div v-else-if="!loading" class="empty-message">
-            Выберите PDF-файл для просмотра страниц.
-        </div>
+                        <!-- Правая область для клика (следующая страница) -->
+                        <div class="nav-area right-area" @click="nextPage"
+                            :class="{ 'disabled': currentPage === pages.length - 1 }"></div>
+                    </div>
 
-        <!-- Сообщение об ошибке -->
-        <div v-if="error" class="error-message">
-            {{ error }}
-        </div>
+                    <!-- Сообщение об ошибке -->
+                    <div v-if="error" class="error-message">
+                        {{ error }}
+                    </div>
+                </div>
+            </template>
+        </ComicHeader>
     </div>
 </template>
 
 <script>
 import axios from "axios";
+import ComicHeader from "../components/Page/comicP.vue";
 
 export default {
+    name: 'PdfViewer',
+    components: {
+        ComicHeader
+    },
     data() {
         return {
             pages: [],
             fileInfo: null,
             loading: false,
-            error: null
+            error: null,
+            currentPage: 0,
+            chapterTitle: 'Название Главы',
+            totalPages: 12
         };
     },
     methods: {
@@ -58,6 +78,7 @@ export default {
             this.fileInfo = null;
             this.error = null;
             this.loading = true;
+            this.currentPage = 0;
 
             const formData = new FormData();
             formData.append("file", file);
@@ -80,6 +101,7 @@ export default {
                         filename: res.data.filename,
                         totalPages: res.data.totalPages
                     };
+                    this.totalPages = res.data.totalPages;
                 } else {
                     this.error = "В PDF нет страниц или неверный формат ответа";
                 }
@@ -98,17 +120,75 @@ export default {
                 // Очищаем input, чтобы можно было загрузить тот же файл снова
                 event.target.value = '';
             }
+        },
+
+        prevPage() {
+            if (this.currentPage > 0) {
+                this.currentPage--;
+            }
+        },
+
+        nextPage() {
+            if (this.currentPage < this.pages.length - 1) {
+                this.currentPage++;
+            }
+        },
+
+        // Обработка клавиш клавиатуры
+        handleKeyDown(e) {
+            if (e.key === 'ArrowLeft') {
+                this.prevPage();
+            } else if (e.key === 'ArrowRight') {
+                this.nextPage();
+            }
         }
+    },
+    mounted() {
+        // Добавляем обработчик клавиатуры
+        window.addEventListener('keydown', this.handleKeyDown);
+    },
+    beforeDestroy() {
+        // Удаляем обработчик при уничтожении компонента
+        window.removeEventListener('keydown', this.handleKeyDown);
     }
 };
 </script>
 
 <style scoped>
 .app {
-    max-width: 900px;
-    margin: auto;
     font-family: sans-serif;
-    padding: 20px;
+}
+
+.pdf-container {
+    width: 100%;
+    min-height: 1050px;
+    /* Чуть меньше h-[1100px] из компонента */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-input-container {
+    margin: 20px 0;
+}
+
+.file-input-label {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.file-input-label:hover {
+    background-color: #45a049;
+}
+
+input[type="file"] {
+    display: none;
 }
 
 .loading {
@@ -122,47 +202,46 @@ export default {
 
 .file-info {
     margin: 15px 0;
-    padding: 15px;
-    background-color: #f5f5f5;
-    border-radius: 4px;
-}
-
-.pages-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    margin-top: 20px;
-    max-height: 80vh;
-    overflow-y: auto;
     padding: 10px;
-}
-
-.page-wrapper {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 10px;
-    background-color: #fafafa;
-}
-
-.page-number {
-    margin: 0 0 10px 0;
-    color: #666;
+    color: white;
     font-size: 14px;
 }
 
-.pdf-page {
+.reader-container {
+    position: relative;
     width: 100%;
-    border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.empty-message {
-    margin-top: 20px;
-    padding: 40px;
-    text-align: center;
-    color: #666;
-    background-color: #f5f5f5;
+.pdf-page {
+    max-width: 100%;
+    max-height: 1000px;
+    object-fit: contain;
     border-radius: 4px;
+}
+
+.nav-area {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 20%;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.left-area {
+    left: 0;
+}
+
+.right-area {
+    right: 0;
+}
+
+.nav-area.disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
 }
 
 .error-message {
@@ -172,5 +251,16 @@ export default {
     color: #c62828;
     border-radius: 4px;
     border: 1px solid #ef9a9a;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .nav-area {
+        width: 15%;
+    }
+
+    .pdf-page {
+        max-height: 600px;
+    }
 }
 </style>
