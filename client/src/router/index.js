@@ -2,13 +2,19 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import headerMenu from "../views/headerMenu.vue";
 import HelloWorld from "../components/HelloWorld.vue";
-import ReadComic from "../views/readComic.vue";
+import comicP from "../views/ComicP.vue";
+import readComic from "../views/readComic.vue";
 
 const routes = [
   {
     path: "/",
+    name: "ComicP",
+    component: comicP,
+  },
+  {
+    path: "/readComic",
     name: "readComic",
-    component: ReadComic,
+    component: readComic,
   },
   {
     path: "/headerMenu",
@@ -16,7 +22,7 @@ const routes = [
     component: headerMenu,
   },
   {
-    path: "/HelloWorld",
+    path: "/helloWorld",
     name: "HelloWorld",
     component: HelloWorld,
   },
