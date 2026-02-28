@@ -2,8 +2,8 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import headerMenu from "../views/headerMenu.vue";
 import HelloWorld from "../components/HelloWorld.vue";
-import comicP from "../views/ComicP.vue";
 import readComic from "../views/readComic.vue";
+import comicP from "../components/Page/comicP.vue";
 
 const routes = [
   {
