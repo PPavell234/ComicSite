@@ -5,4 +5,10 @@ import tailwindcss from "@tailwindcss/vite";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [vue(), tailwindcss()],
+
+  server: {
+    proxy: {
+      "/api": "http://localhost:8080", // Прокси для Spring Boot API
+    },
+  },
 });
