@@ -136,9 +136,39 @@
                         <p>обложка</p>
                     </div>
 
-                    <!-- Обложка -->
-                    <div class="bg-gray-600 w-[440px] h-[660px] rounded-xl flex items-center justify-center">
-                        <p class="text-white">Обложка</p>
+                    <!-- Обложка с возможностью выбора -->
+                    <div class="bg-gray-600 w-[440px] h-[660px] rounded-xl flex items-center justify-center relative group cursor-pointer overflow-hidden"
+                        :class="{ 'border-4 border-yellow-500': showPageSelector }" @click="togglePageSelector">
+                        <!-- Отображение выбранной обложки -->
+                        <img v-if="selectedCover" :src="selectedCover" class="w-full h-full object-cover rounded-xl"
+                            alt="Обложка" />
+                        <p v-else class="text-white">Обложка</p>
+
+                        <!-- Индикатор выбора (появляется при наведении) -->
+                        <div
+                            class="absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <p class="text-white text-lg font-semibold">
+                                {{ pdfPages.length ? 'Выбрать обложку' : 'Сначала загрузите PDF' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- СЕЛЕКТОР СТРАНИЦ ДЛЯ ВЫБОРА ОБЛОЖКИ -->
+                    <div v-if="showPageSelector && pdfPages.length > 0" class="mt-4 bg-[#464343] p-4 rounded-xl">
+                        <p class="text-white mb-3">Выберите страницу для обложки:</p>
+                        <div class="grid grid-cols-3 gap-2 max-h-[300px] overflow-y-auto">
+                            <div v-for="(page, index) in pdfPages" :key="index"
+                                class="cursor-pointer border-2 rounded-lg overflow-hidden"
+                                :class="{ 'border-yellow-500': selectedCoverIndex === index }"
+                                @click="selectCover(index)">
+                                <img :src="page" :alt="'Страница ' + (index + 1)" class="w-full h-24 object-cover" />
+                                <p class="text-white text-center text-sm py-1 bg-gray-700">Стр. {{ index + 1 }}</p>
+                            </div>
+                        </div>
+                        <button @click="showPageSelector = false"
+                            class="mt-3 w-full bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                            Закрыть
+                        </button>
                     </div>
 
                     <!-- Название комикса -->
@@ -152,11 +182,9 @@
                     <div class="bg-[#D2D2D2] w-full h-[120px] mt-3 rounded-xl flex flex-col items-center justify-center cursor-pointer"
                         :class="{ 'opacity-50': loading }" @click="triggerFileUpload" @dragover.prevent
                         @drop.prevent="handleDrop">
-                        <!-- Скрытый input -->
                         <input type="file" @change="uploadPdf" accept=".pdf" :disabled="loading" class="hidden"
                             id="pdf-upload-input" />
 
-                        <!-- Блок с иконкой и текстом -->
                         <div class="flex flex-center items-center gap-3">
                             <img src="/imagePage/button-icon/upload-2-line.svg" alt="">
                             <p class="mt-2 text-sm text-gray-700">
@@ -164,12 +192,10 @@
                             </p>
                         </div>
 
-                        <!-- Второй текст -->
                         <p class="mt-2 text-sm text-gray-700">
                             {{ loading ? 'Пожалуйста, подождите...' : 'Drag and drop PDF here or click to upload' }}
                         </p>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -184,16 +210,16 @@
 
         <div class="bg-gray-800 h-[50px] "></div>
 
-        <!-- Компонент ComicP получает загруженные страницы -->
-        <ComicP :pages="pdfPages" :loading="loading"></ComicP>
-
+        <!-- Компонент ComicP с перелистыванием -->
+        <ComicP :chapterTitle="textInput1 || 'Название Главы'" :currentPage="1" :totalPages="pdfPages.length"
+            :pages="pdfPages"></ComicP>
     </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import ComicP from '../components/Page/comicP.vue'
-import axios from 'axios' // Добавляем axios для реальных запросов
+import axios from 'axios'
 
 //Количетсво символов для 
 const textInput1 = ref('')
@@ -231,11 +257,12 @@ function removeTag(index) {
     tags.value.splice(index, 1)
 }
 
-// ЗАГРУЗКА PDF - исправленная версия
+// ЗАГРУЗКА PDF И ВЫБОР ОБЛОЖКИ
 const loading = ref(false)
-const pdfPages = ref([]) // Переименовано с pages на pdfPages для ясности
-const fileInfo = ref(null)
-const error = ref(null)
+const pdfPages = ref([])
+const selectedCover = ref(null) // URL выбранной обложки
+const selectedCoverIndex = ref(null) // Индекс выбранной страницы
+const showPageSelector = ref(false) // Показывать/скрывать селектор страниц
 
 // Функция для открытия диалога выбора файла
 const triggerFileUpload = () => {
@@ -244,7 +271,7 @@ const triggerFileUpload = () => {
     }
 }
 
-// Функция загрузки PDF (с реальным запросом к серверу)
+// Функция загрузки PDF
 const uploadPdf = async (event) => {
     const file = event.target.files[0]
     if (!file) return
@@ -254,56 +281,31 @@ const uploadPdf = async (event) => {
         return
     }
 
-    // Сброс состояния
     pdfPages.value = []
-    fileInfo.value = null
-    error.value = null
+    selectedCover.value = null
+    selectedCoverIndex.value = null
     loading.value = true
 
     const formData = new FormData()
     formData.append("file", file)
 
     try {
-        // Реальный запрос к вашему серверу
         const res = await axios.post("http://localhost:8080/api/upload-pdf", formData, {
             headers: {
                 "Content-Type": "multipart/form-data"
             },
-            timeout: 300000 // 5 минут
+            timeout: 300000
         })
 
-        console.log("Ответ от сервера:", res.data)
-
-        if (res.data.error) {
-            error.value = res.data.error
-            alert('Ошибка: ' + res.data.error)
-        } else if (res.data.pages && res.data.pages.length) {
-            // Сохраняем страницы
+        if (res.data.pages && res.data.pages.length) {
             pdfPages.value = res.data.pages
-            fileInfo.value = {
-                filename: res.data.filename,
-                totalPages: res.data.totalPages
-            }
-
-            alert(`PDF успешно загружен! ${res.data.totalPages} страниц`)
-        } else {
-            error.value = "В PDF нет страниц или неверный формат ответа"
-            alert(error.value)
+            alert(`PDF успешно загружен! ${res.data.pages.length} страниц`)
         }
     } catch (err) {
         console.error("Ошибка загрузки PDF:", err)
-
-        if (err.code === 'ECONNABORTED') {
-            error.value = "Превышено время ожидания. Файл слишком большой."
-        } else if (err.response) {
-            error.value = err.response.data?.error || err.response.data || err.message
-        } else {
-            error.value = err.message
-        }
-        alert('Ошибка: ' + error.value)
+        alert('Ошибка: ' + err.message)
     } finally {
         loading.value = false
-        // Очищаем input
         event.target.value = ''
     }
 }
@@ -321,6 +323,23 @@ const handleDrop = (event) => {
     } else {
         alert('Пожалуйста, выберите PDF файл')
     }
+}
+
+// Функция для показа/скрытия селектора страниц
+const togglePageSelector = () => {
+    if (pdfPages.value.length > 0) {
+        showPageSelector.value = !showPageSelector.value
+    } else {
+        alert('Сначала загрузите PDF файл')
+    }
+}
+
+// Функция выбора обложки
+const selectCover = (index) => {
+    selectedCover.value = pdfPages.value[index]
+    selectedCoverIndex.value = index
+    showPageSelector.value = false
+    alert(`Страница ${index + 1} выбрана как обложка`)
 }
 </script>
 
@@ -398,5 +417,41 @@ const handleDrop = (event) => {
 
 .hidden {
     display: none;
+}
+
+/* Стили для селектора обложки */
+.border-yellow-500 {
+    border-color: #eab308;
+}
+
+.group:hover .group-hover\:opacity-100 {
+    opacity: 1;
+}
+
+.transition-opacity {
+    transition: opacity 0.3s ease;
+}
+
+.overflow-y-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #333;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+    width: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+    background: #333;
+    border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 </style>
