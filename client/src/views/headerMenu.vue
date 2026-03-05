@@ -45,7 +45,7 @@
         </div>
 
         <!-- Второй блок -->
-        <div class="bg-[#464343] min-h-screen ml-[200px] mr-[300px] mt-38">
+        <div class="bg-[#464343] min-h-screen ml-[200px] mr-[300px] mt-38 pb-12 ">
             <div class="flex flex-row ml-[60px] mr-[300px] gap-55">
 
                 <!-- ЛЕВАЯ КОЛОНКА (БЕЗ ИЗМЕНЕНИЙ) -->
@@ -167,6 +167,17 @@
 
             </div>
         </div>
+        <!-- кк -->
+        <div class="bg-gray-800 h-[50px] "></div>
+
+        <div class="bg-[#464343] h-[130px] ml-[200px] mr-[300px] flex justify-center items-center pt-12 gap-2">
+            <h1>Пред просмотр Страниц</h1>
+            <img src="/imagePage/headerMenu/eas.svg" alt="">
+        </div>
+
+        <div class="bg-gray-800 h-[50px] "></div>
+
+
 
 
 
@@ -178,9 +189,9 @@
 
 <script setup>
 
-
-
 import { ref } from 'vue'
+
+
 
 //Количетсво символов для 
 
