@@ -46,7 +46,7 @@
 
         <!-- Второй блок -->
         <div class="bg-[#464343] min-h-screen ml-[200px] mr-[300px] mt-38">
-            <div class="flex flex-row ml-[60px] mr-[229px] gap-70">
+            <div class="flex flex-row ml-[60px] mr-[300px] gap-55">
 
                 <!-- ЛЕВАЯ КОЛОНКА (БЕЗ ИЗМЕНЕНИЙ) -->
                 <div class="mt-10">
@@ -131,14 +131,14 @@
 
 
                 <!-- ПРАВАЯ КОЛОНКА -->
-                <div class="mt-80 w-[440px]">
+                <div class="mt-80">
                     <div class="flex justify-left gap-3 relative -top-6 ">
                         <img src="/imagePage/button-icon/upload-2-line.svg" alt="">
                         <p>обложка</p>
                     </div>
 
                     <!-- Обложка -->
-                    <div class="bg-gray-600 w-full h-[660px] rounded-xl flex items-center justify-center">
+                    <div class="bg-gray-600 w-[440px] h-[660px] rounded-xl flex items-center justify-center">
                         <p class="text-white">Обложка</p>
                     </div>
 
