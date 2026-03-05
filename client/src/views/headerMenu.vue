@@ -177,6 +177,8 @@
 
         <div class="bg-gray-800 h-[50px] "></div>
 
+        <ComicP></ComicP>
+
 
 
 
@@ -188,6 +190,9 @@
 </template>
 
 <script setup>
+
+//Компонент
+import ComicP from '../components/Page/comicP.vue'
 
 import { ref } from 'vue'
 
