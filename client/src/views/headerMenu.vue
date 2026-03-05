@@ -129,7 +129,6 @@
 
                 </div>
 
-
                 <!-- ПРАВАЯ КОЛОНКА -->
                 <div class="mt-80">
                     <div class="flex justify-left gap-3 relative -top-6 ">
@@ -149,11 +148,11 @@
                         </p>
                     </div>
 
-                    <!-- Ваш красивый div для загрузки -->
+                    <!-- Ваш красивый div для загрузки PDF -->
                     <div class="bg-[#D2D2D2] w-full h-[120px] mt-3 rounded-xl flex flex-col items-center justify-center cursor-pointer"
                         :class="{ 'opacity-50': loading }" @click="triggerFileUpload" @dragover.prevent
                         @drop.prevent="handleDrop">
-                        <!-- Скрытый input - УБИРАЕМ ref и добавляем id -->
+                        <!-- Скрытый input -->
                         <input type="file" @change="uploadPdf" accept=".pdf" :disabled="loading" class="hidden"
                             id="pdf-upload-input" />
 
@@ -161,20 +160,20 @@
                         <div class="flex flex-center items-center gap-3">
                             <img src="/imagePage/button-icon/upload-2-line.svg" alt="">
                             <p class="mt-2 text-sm text-gray-700">
-                                {{ loading ? 'Загрузка...' : 'Загрузить обложку files' }}
+                                {{ loading ? 'Загрузка...' : 'Загрузить PDF файлы' }}
                             </p>
                         </div>
 
                         <!-- Второй текст -->
                         <p class="mt-2 text-sm text-gray-700">
-                            {{ loading ? 'Пожалуйста, подождите...' : 'Drag and drop files here or click to upload' }}
+                            {{ loading ? 'Пожалуйста, подождите...' : 'Drag and drop PDF here or click to upload' }}
                         </p>
                     </div>
 
                 </div>
-
             </div>
         </div>
+
         <!-- кк -->
         <div class="bg-gray-800 h-[50px] "></div>
 
@@ -185,104 +184,127 @@
 
         <div class="bg-gray-800 h-[50px] "></div>
 
-        <ComicP></ComicP>
-
-
-
-
-
+        <!-- Компонент ComicP получает загруженные страницы -->
+        <ComicP :pages="pdfPages" :loading="loading"></ComicP>
 
     </div>
-
-
 </template>
 
 <script setup>
-
-//Компонент
-import ComicP from '../components/Page/comicP.vue'
-
 import { ref } from 'vue'
-
-
+import ComicP from '../components/Page/comicP.vue'
+import axios from 'axios' // Добавляем axios для реальных запросов
 
 //Количетсво символов для 
-
-const textInput1 = ref('')  // Для первого текстового поля
-const charCount1 = ref(0)   // Счётчик символов для первого текстового поля
-
+const textInput1 = ref('')
+const charCount1 = ref(0)
 const textInput2 = ref('')
 const charCount2 = ref(0)
-
 const textInput3 = ref('')
 const charCount3 = ref(0)
 
 function updateCharacterCount1() {
     charCount1.value = textInput1.value.length
 }
-
 function updateCharacterCount2() {
-
     charCount2.value = textInput2.value.length
 }
-
 function updateCharacterCount3() {
-
     charCount3.value = textInput3.value.length
 }
 
 //Создание тегов для поля с тегами
-// Состояние для текста в поле
 const textInput = ref('')
-// Состояние для списка тегов
 const tags = ref([])
 
-// Обновление тегов при вводе текста
 function addTagOnSpace(event) {
-    // Если нажата клавиша пробел
     if (event.key === ' ' && textInput.value.trim()) {
-        // Добавляем тег, если текст не пустой и не содержит уже такой тег
         const newTag = textInput.value.trim()
         if (!tags.value.includes(newTag)) {
             tags.value.push(newTag)
         }
-        // Очищаем поле ввода после добавления тега
         textInput.value = ''
     }
 }
 
-// Удаление тега
 function removeTag(index) {
     tags.value.splice(index, 1)
 }
 
-//Окно загрузки пдф
+// ЗАГРУЗКА PDF - исправленная версия
 const loading = ref(false)
-const pages = ref([])
+const pdfPages = ref([]) // Переименовано с pages на pdfPages для ясности
+const fileInfo = ref(null)
+const error = ref(null)
 
 // Функция для открытия диалога выбора файла
 const triggerFileUpload = () => {
     if (!loading.value) {
-        // Находим input по ID и вызываем click
         document.getElementById('pdf-upload-input').click()
     }
 }
 
-// Функция загрузки PDF
-const uploadPdf = (event) => {
+// Функция загрузки PDF (с реальным запросом к серверу)
+const uploadPdf = async (event) => {
     const file = event.target.files[0]
-    if (file && file.type === 'application/pdf') {
-        console.log('Выбран файл:', file.name)
-        loading.value = true
+    if (!file) return
 
-        // Имитация загрузки
-        setTimeout(() => {
-            loading.value = false
-            pages.value = [file]
-            alert('Файл успешно загружен!')
-        }, 2000)
-    } else {
+    if (file.type !== 'application/pdf') {
         alert('Пожалуйста, выберите PDF файл')
+        return
+    }
+
+    // Сброс состояния
+    pdfPages.value = []
+    fileInfo.value = null
+    error.value = null
+    loading.value = true
+
+    const formData = new FormData()
+    formData.append("file", file)
+
+    try {
+        // Реальный запрос к вашему серверу
+        const res = await axios.post("http://localhost:8080/api/upload-pdf", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            },
+            timeout: 300000 // 5 минут
+        })
+
+        console.log("Ответ от сервера:", res.data)
+
+        if (res.data.error) {
+            error.value = res.data.error
+            alert('Ошибка: ' + res.data.error)
+        } else if (res.data.pages && res.data.pages.length) {
+            // Сохраняем страницы
+            pdfPages.value = res.data.pages
+            fileInfo.value = {
+                filename: res.data.filename,
+                totalPages: res.data.totalPages
+            }
+
+            alert(`PDF успешно загружен! ${res.data.totalPages} страниц`)
+        } else {
+            error.value = "В PDF нет страниц или неверный формат ответа"
+            alert(error.value)
+        }
+    } catch (err) {
+        console.error("Ошибка загрузки PDF:", err)
+
+        if (err.code === 'ECONNABORTED') {
+            error.value = "Превышено время ожидания. Файл слишком большой."
+        } else if (err.response) {
+            error.value = err.response.data?.error || err.response.data || err.message
+        } else {
+            error.value = err.message
+        }
+        alert('Ошибка: ' + error.value)
+    } finally {
+        loading.value = false
+        // Очищаем input
+        event.target.value = ''
     }
 }
 
@@ -300,15 +322,12 @@ const handleDrop = (event) => {
         alert('Пожалуйста, выберите PDF файл')
     }
 }
-
 </script>
 
 <style scoped>
 /* Это для ввода 2 (описнаие) */
-
 .text-area::placeholder {
     color: #16181b;
-
     opacity: 1;
 }
 
@@ -349,24 +368,6 @@ const handleDrop = (event) => {
 }
 
 /* Это для Тегов стиль */
-
-/* Стиль для текстового поля */
-.text-field-container {
-    width: 100%;
-    max-width: 600px;
-}
-
-.text-area {
-    width: 100%;
-    height: 100px;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #161616;
-    border-radius: 4px;
-    resize: none;
-}
-
-/* Стиль для тегов */
 .tags-container {
     display: flex;
     flex-wrap: wrap;
@@ -388,5 +389,14 @@ const handleDrop = (event) => {
     color: rgb(8, 8, 8);
     cursor: pointer;
     margin-left: 8px;
+}
+
+.opacity-50 {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.hidden {
+    display: none;
 }
 </style>
