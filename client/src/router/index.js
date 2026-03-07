@@ -4,6 +4,7 @@ import headerMenu from "../views/headerMenu.vue";
 import HelloWorld from "../components/HelloWorld.vue";
 import readComic from "../views/readComic.vue";
 import comicP from "../components/Page/comicP.vue";
+import UserList from "../components/UserList.vue";
 
 const routes = [
   {
@@ -15,6 +16,11 @@ const routes = [
     path: "/readComic",
     name: "readComic",
     component: readComic,
+  },
+  {
+    path: "/userList",
+    name: "userList",
+    component: UserList,
   },
   {
     path: "/headerMenu",
