@@ -1,51 +1,11 @@
 <template>
-    <div class="bg-gray-800 min-h-screen text-white">
-        <div class="flex flex-row ml-[193px] mr-[193px]">
-            <!-- Heder-->
-            <div class="Heder flex flex-row mt-8">
-                <img src="/imagePage/headerMenu/Logo.png" alt="">
-                <div class="flex flex-row ml-[350px] gap-20">
-                    <ul>
-                        <li class="flex items-center space-x-2">
-                            <img src="/imagePage/headerMenu/Icon.png" alt="" class="w-3 h-3">
-                            <p>Каталог</p>
-                        </li>
-                    </ul>
-                    <ul>
-                        <li class="flex items-center space-x-2">
-                            <img src="/imagePage/headerMenu/Icon-1.png" alt="" class="w-3 h-3">
-                            <p>Поиск</p>
-                        </li>
-                    </ul>
-                    <ul>
-                        <li class="flex items-center space-x-2">
-                            <img src="/imagePage/headerMenu/Icon-2.png" alt="" class="w-3 h-3">
-                            <p>Форум</p>
-                        </li>
-                    </ul>
-                </div>
-                <div class="flex flex-row ml-[138px] gap-30">
-                    <ul>
-                        <li class="flex items-center space-x-2">
-                            <img src="/imagePage/headerMenu/Icon-2.png" alt="" class="w-3 h-3">
-                            <p>Заказать комикс</p>
-                        </li>
-                    </ul>
-                    <ul>
-                        <li class="flex items-center space-x-2">
-                            <button
-                                class="flex items-center bg-yellow-500 text-white py-1 px-3 rounded-full hover:bg-yellow-300 hover:scale-105 transition-all">
-                                <img src="/imagePage/headerMenu/Icon-3.png" alt="" class="w-4 h-4 mr-2">
-                                <p>Выход / Регистрация</p>
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+    <div class="bg-gray-800 text-white">
+
+        <headerMenu></headerMenu>
+
 
         <!-- Второй блок -->
-        <div class="bg-[#464343] min-h-screen ml-[200px] mr-[300px] mt-38 pb-12 ">
+        <div class="bg-[#464343] min-h-screen ml-[200px] mr-[300px] pb-12 ">
             <div class="flex flex-row ml-[60px] mr-[300px] gap-55">
 
                 <!-- ЛЕВАЯ КОЛОНКА (БЕЗ ИЗМЕНЕНИЙ) -->
@@ -218,8 +178,12 @@
 
 <script setup>
 import { ref } from 'vue'
-import ComicP from '../components/Page/comicP.vue'
 import axios from 'axios'
+// Компоненты
+import ComicP from '../components/Page/comicP.vue'
+import headerMenu from '../components/Page/headerMenu.vue'
+
+//--------------------------------------------------
 
 //Количетсво символов для 
 const textInput1 = ref('')
@@ -341,6 +305,14 @@ const selectCover = (index) => {
     showPageSelector.value = false
     alert(`Страница ${index + 1} выбрана как обложка`)
 }
+</script>
+
+
+<script setup>
+
+
+
+
 </script>
 
 <style scoped>
