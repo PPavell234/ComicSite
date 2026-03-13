@@ -6,87 +6,22 @@
 
         <!-- Лист с комиксами Исп в начале-->
         <div class="bg-[#353333] h-[320px] flex items-center justify-start max-w-[1450px] mx-auto pl-23 gap-12">
-            <!-- Комикс -->
-            <div class="text-white">
-                <!-- Я использую фон (не забыть) -->
-                <div class="relative w-[170px] h-[250px] bg-no-repeat bg-center bg-cover"
-                    style="background-image: url('/imagePage/comic-list/Comic.svg');">
-                    <img src="/imagePage/comic-list/Favorite.svg" alt="" class="absolute top-2 left-2 w-6 h-6">
-                    <p class="absolute bottom-2 left-2 bg-black bg-opacity-70  px-2 py-1 rounded">
-                        Глава 4
-                    </p>
-                </div>
-                <p>Король в черном</p>
-            </div>
-            <!-- Комикс -->
-            <div class="text-white">
-                <!-- Я использую фон (не забыть) -->
-                <div class="relative w-[170px] h-[250px] bg-no-repeat bg-center bg-cover"
-                    style="background-image: url('/imagePage/comic-list/Comic.svg');">
-                    <img src="/imagePage/comic-list/Favorite.svg" alt="" class="absolute top-2 left-2 w-6 h-6">
-                    <p class="absolute bottom-2 left-2 bg-black bg-opacity-70  px-2 py-1 rounded">
-                        Глава 4
-                    </p>
-                </div>
-                <p>Король в черном</p>
-            </div>
-            <!-- Комикс -->
-            <div class="text-white">
-                <!-- Я использую фон (не забыть) -->
-                <div class="relative w-[170px] h-[250px] bg-no-repeat bg-center bg-cover"
-                    style="background-image: url('/imagePage/comic-list/Comic.svg');">
-                    <img src="/imagePage/comic-list/Favorite.svg" alt="" class="absolute top-2 left-2 w-6 h-6">
-                    <p class="absolute bottom-2 left-2 bg-black bg-opacity-70  px-2 py-1 rounded">
-                        Глава 4
-                    </p>
-                </div>
-                <p>Король в черном</p>
-            </div>
-            <!-- Комикс -->
-            <div class="text-white">
-                <!-- Я использую фон (не забыть) -->
-                <div class="relative w-[170px] h-[250px] bg-no-repeat bg-center bg-cover"
-                    style="background-image: url('/imagePage/comic-list/Comic.svg');">
-                    <img src="/imagePage/comic-list/Favorite.svg" alt="" class="absolute top-2 left-2 w-6 h-6">
-                    <p class="absolute bottom-2 left-2 bg-black bg-opacity-70  px-2 py-1 rounded">
-                        Глава 4
-                    </p>
-                </div>
-                <p>Король в черном</p>
-            </div>
-            <!-- Комикс -->
-            <div class="text-white">
-                <!-- Я использую фон (не забыть) -->
-                <div class="relative w-[170px] h-[250px] bg-no-repeat bg-center bg-cover"
-                    style="background-image: url('/imagePage/comic-list/Comic.svg');">
-                    <img src="/imagePage/comic-list/Favorite.svg" alt="" class="absolute top-2 left-2 w-6 h-6">
-                    <p class="absolute bottom-2 left-2 bg-black bg-opacity-70  px-2 py-1 rounded">
-                        Глава 4
-                    </p>
-                </div>
-                <p>Король в черном</p>
-            </div>
-            <!-- Комикс -->
-            <div class="text-white">
-                <!-- Я использую фон (не забыть) -->
-                <div class="relative w-[170px] h-[250px] bg-no-repeat bg-center bg-cover"
-                    style="background-image: url('/imagePage/comic-list/Comic.svg');">
-                    <img src="/imagePage/comic-list/Favorite.svg" alt="" class="absolute top-2 left-2 w-6 h-6">
-                    <p class="absolute bottom-2 left-2 bg-black bg-opacity-70  px-2 py-1 rounded">
-                        Глава 4
-                    </p>
-                </div>
-                <p>Король в черном</p>
-            </div>
+
+            <comic-title v-for="comic in comics" :key="comic.id" :title="comic.title" :chapter="comic.chapter"
+                :bg="comic.bg" :favorite="comic.favorite" />
+
         </div>
 
         <!-- Пустое простартсво-->
-        <div class="h-[20px] flex items-center justify-start max-w-[1450px] mx-auto pl-23 gap-12"></div>
+        <div class="h-[25px] flex items-center justify-start mx-auto pl-23 gap-12"></div>
 
 
         <!-- News page -->
         <div class="bg-[#353333] h-[110px] max-w-[1450px] mx-auto relative">
             <img src="/imagePage/NewsPage/NewsPage.png" alt="" class="w-full h-full object-cover">
+        </div>
+
+        <div>
         </div>
 
 
@@ -102,7 +37,39 @@
 // Компоненты
 import HeaderMenu from '../components/Page/headerMenu.vue';
 import headerMenu from '../components/Page/headerMenu.vue'
+import comicTitle from '../components/Page/comicTitle.vue';
 
 //--------------------------------------------------
+
+const comics = [
+    {
+        id: 1,
+        title: "Король в черном",
+        chapter: 4,
+        bg: "/imagePage/comic-list/Comic.svg",
+        favorite: "/imagePage/comic-list/Favorite.svg"
+    },
+    {
+        id: 2,
+        title: "Spider-Man",
+        chapter: 12,
+        bg: "/imagePage/comic-list/Comic2.svg",
+        favorite: "/imagePage/comic-list/Favorite.svg"
+    },
+    {
+        id: 3,
+        title: "Batman",
+        chapter: 1,
+        bg: "/imagePage/comic-list/Comic3.svg",
+        favorite: "/imagePage/comic-list/Favorite.svg"
+    },
+    {
+        id: 4,
+        title: "Batman",
+        chapter: 1,
+        bg: "/imagePage/comic-list/Comic3.svg",
+        favorite: "/imagePage/comic-list/Favorite.svg"
+    }
+]
 
 </script>

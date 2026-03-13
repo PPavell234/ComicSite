@@ -8,6 +8,7 @@ import UserList from "../components/UserList.vue";
 import MainPage from "../views/mainPage.vue";
 import HeaderMenuf from "../views/headerMenuf.vue";
 import HeaderMenu from "../components/Page/headerMenu.vue";
+import ComicTitle from "../components/Page/comicTitle.vue";
 
 const routes = [
   //Комонент
@@ -45,6 +46,12 @@ const routes = [
     path: "/helloWorld",
     name: "HelloWorld",
     component: HelloWorld,
+  },
+  //Компоненты 2
+  {
+    path: "/title",
+    name: "comicTitle",
+    component: ComicTitle,
   },
 ];
 
