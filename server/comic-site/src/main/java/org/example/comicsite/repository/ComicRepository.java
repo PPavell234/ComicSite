@@ -1,0 +1,12 @@
+package org.example.comicsite.repository;
+
+import org.example.comicsite.model.Comic;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+import java.util.List;
+
+@Repository
+public interface ComicRepository extends MongoRepository<Comic, String> {
+    List<Comic> findByUserId(String userId);
+    List<Comic> findByTitleContainingIgnoreCase(String title);
+}
