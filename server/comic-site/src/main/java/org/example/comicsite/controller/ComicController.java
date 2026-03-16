@@ -1,10 +1,20 @@
 package org.example.comicsite.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSBuckets;
+import org.apache.pdfbox.io.IOUtils;
+import org.bson.types.ObjectId;
 import org.example.comicsite.model.Comic;
 import org.example.comicsite.repository.ComicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +27,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/comics")
+@CrossOrigin(origins = "http://localhost:5173") // Важно для CORS!
 public class ComicController {
 
     @Autowired
@@ -26,47 +37,45 @@ public class ComicController {
     private GridFsTemplate gridFsTemplate;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private MongoDatabaseFactory mongoDatabaseFactory;
 
-    // 1. СОЗДАНИЕ КОМИКСА (с файлами)
+    // СОЗДАНИЕ КОМИКСА
     @PostMapping(value = "/create", consumes = {"multipart/form-data"})
     public ResponseEntity<?> createComic(
             @RequestParam("userId") String userId,
             @RequestParam("title") String title,
             @RequestParam("description") String description,
-            @RequestParam("tags") String tags,  // Принимаем как строку с запятыми
+            @RequestParam("tags") String tags,
+            @RequestParam("chapterNumber") Integer chapterNumber,
             @RequestParam("year") Integer year,
             @RequestParam("translator") String translator,
             @RequestParam("artist") String artist,
-            @RequestParam(value = "cover", required = false) MultipartFile coverFile,
+            @RequestParam("cover") MultipartFile coverFile,
             @RequestParam("pdf") MultipartFile pdfFile) {
 
         try {
-            // Логируем полученные данные
-            System.out.println("Создание комикса: " + title);
-            System.out.println("PDF файл: " + pdfFile.getOriginalFilename());
-            if (coverFile != null) {
-                System.out.println("Обложка: " + coverFile.getOriginalFilename());
-            } else {
-                System.out.println("Обложка не загружена, будет использована первая страница PDF");
-            }
+            System.out.println("=== СОЗДАНИЕ КОМИКСА ===");
+            System.out.println("Title: " + title);
+            System.out.println("Chapter: " + chapterNumber);
+            System.out.println("Cover file: " + coverFile.getOriginalFilename());
+            System.out.println("Cover size: " + coverFile.getSize());
+            System.out.println("PDF file: " + pdfFile.getOriginalFilename());
 
-            // 1. Сохраняем PDF в GridFS
-            String pdfId = gridFsTemplate.store(
+            // 1. Сохраняем обложку в GridFS
+            ObjectId coverId = gridFsTemplate.store(
+                    coverFile.getInputStream(),
+                    coverFile.getOriginalFilename(),
+                    coverFile.getContentType()
+            );
+            System.out.println("Cover saved with ID: " + coverId.toString());
+
+            // 2. Сохраняем PDF в GridFS
+            ObjectId pdfId = gridFsTemplate.store(
                     pdfFile.getInputStream(),
                     pdfFile.getOriginalFilename(),
                     pdfFile.getContentType()
-            ).toString();
-
-            // 2. Сохраняем обложку (если есть)
-            String coverId = null;
-            if (coverFile != null && !coverFile.isEmpty()) {
-                coverId = gridFsTemplate.store(
-                        coverFile.getInputStream(),
-                        coverFile.getOriginalFilename(),
-                        coverFile.getContentType()
-                ).toString();
-            }
+            );
+            System.out.println("PDF saved with ID: " + pdfId.toString());
 
             // 3. Создаем комикс
             Comic comic = new Comic();
@@ -74,29 +83,31 @@ public class ComicController {
             comic.setTitle(title);
             comic.setDescription(description);
 
-            // Разбиваем теги
             List<String> tagList = Arrays.asList(tags.split(","));
             comic.setTags(tagList);
 
+            comic.setChapterNumber(chapterNumber);
             comic.setYear(year);
             comic.setTranslator(translator);
             comic.setArtist(artist);
-            comic.setCoverImageId(coverId);
-            comic.setPdfFileId(pdfId);
+            comic.setCoverImageId(coverId.toString());
+            comic.setPdfFileId(pdfId.toString());
 
             // 4. Сохраняем в БД
             Comic savedComic = comicRepository.save(comic);
+            System.out.println("Comic saved with ID: " + savedComic.getId());
 
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Комикс успешно создан!");
             response.put("id", savedComic.getId());
             response.put("title", savedComic.getTitle());
-            response.put("pdfFileId", pdfId);
-            response.put("coverImageId", coverId);
+            response.put("coverImageId", coverId.toString());
+            response.put("pdfFileId", pdfId.toString());
 
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
+            System.err.println("ОШИБКА: " + e.getMessage());
             e.printStackTrace();
             Map<String, String> error = new HashMap<>();
             error.put("error", "Ошибка при создании комикса: " + e.getMessage());
@@ -104,16 +115,111 @@ public class ComicController {
         }
     }
 
-    // 2. ПОЛУЧИТЬ ВСЕ КОМИКСЫ
+    // ПОЛУЧИТЬ ВСЕ КОМИКСЫ
     @GetMapping("/all")
-    public List<Comic> getAllComics() {
-        return comicRepository.findAll();
+    public ResponseEntity<List<Comic>> getAllComics() {
+        try {
+            List<Comic> comics = comicRepository.findAll();
+            System.out.println("Найдено комиксов: " + comics.size());
+            return ResponseEntity.ok(comics);
+        } catch (Exception e) {
+            System.err.println("Ошибка получения комиксов: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    // 3. ПОЛУЧИТЬ КОМИКС ПО ID
-    @GetMapping("/{id}")
-    public Comic getComicById(@PathVariable String id) {
-        return comicRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Комикс не найден"));
+    // ПОЛУЧИТЬ ФАЙЛ ПО ID (ОБЛОЖКА)
+    @GetMapping("/files/{fileId}")
+    public ResponseEntity<byte[]> getFile(@PathVariable String fileId) {
+        try {
+            System.out.println("Запрос файла с ID: " + fileId);
+
+            // Проверяем валидность ObjectId
+            ObjectId objectId;
+            try {
+                objectId = new ObjectId(fileId);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Невалидный ObjectId: " + fileId);
+                return ResponseEntity.badRequest().build();
+            }
+
+            // Находим файл в GridFS
+            var file = gridFsTemplate.findOne(
+                    Query.query(Criteria.where("_id").is(objectId))
+            );
+
+            if (file == null) {
+                System.out.println("Файл не найден в GridFS: " + fileId);
+                return ResponseEntity.notFound().build();
+            }
+
+            System.out.println("Файл найден: " + file.getFilename());
+            System.out.println("Размер файла: " + file.getLength());
+
+            // Получаем GridFSBucket
+            GridFSBucket gridFSBucket = GridFSBuckets.create(mongoDatabaseFactory.getMongoDatabase());
+
+            // Получаем InputStream и читаем байты
+            byte[] bytes = IOUtils.toByteArray(gridFSBucket.openDownloadStream(objectId));
+
+            HttpHeaders headers = new HttpHeaders();
+
+            // Определяем Content-Type
+            String contentType = "image/jpeg"; // по умолчанию
+            if (file.getMetadata() != null && file.getMetadata().get("_contentType") != null) {
+                contentType = file.getMetadata().getString("_contentType");
+            }
+            headers.setContentType(MediaType.parseMediaType(contentType));
+            headers.setContentLength(bytes.length);
+
+            // Добавляем заголовки для кэширования
+            headers.setCacheControl("max-age=3600");
+
+            System.out.println("Отправка файла: " + bytes.length + " байт, тип: " + contentType);
+
+            return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+
+        } catch (Exception e) {
+            System.err.println("Ошибка при получении файла: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // ТЕСТОВЫЙ ENDPOINT ДЛЯ ПРОВЕРКИ ФАЙЛА
+    @GetMapping("/test-file/{fileId}")
+    public ResponseEntity<Map<String, Object>> testFile(@PathVariable String fileId) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            ObjectId objectId = new ObjectId(fileId);
+
+            var file = gridFsTemplate.findOne(
+                    Query.query(Criteria.where("_id").is(objectId))
+            );
+
+            if (file == null) {
+                result.put("found", false);
+                result.put("message", "Файл не найден");
+                return ResponseEntity.ok(result);
+            }
+
+            result.put("found", true);
+            result.put("filename", file.getFilename());
+            result.put("length", file.getLength());
+            result.put("contentType", file.getMetadata() != null ?
+                    file.getMetadata().get("_contentType") : "unknown");
+            result.put("uploadDate", file.getUploadDate());
+
+            // Пробуем прочитать первые байты для проверки
+            GridFSBucket gridFSBucket = GridFSBuckets.create(mongoDatabaseFactory.getMongoDatabase());
+            byte[] bytes = IOUtils.toByteArray(gridFSBucket.openDownloadStream(objectId));
+            result.put("bytesRead", bytes.length);
+            result.put("isReadable", true);
+
+        } catch (Exception e) {
+            result.put("error", e.getMessage());
+            result.put("errorType", e.getClass().getName());
+        }
+        return ResponseEntity.ok(result);
     }
 }

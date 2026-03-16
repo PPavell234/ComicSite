@@ -12,6 +12,11 @@
                 <div class="w-[140px] h-4 bg-gray-600 mt-2 rounded"></div>
             </div>
 
+            <!-- Сообщение если нет комиксов -->
+            <div v-else-if="comics.length === 0" class="text-white text-center w-full py-10">
+                Пока нет опубликованных комиксов
+            </div>
+
             <!-- Реальные комиксы из БД -->
             <comic-title v-for="comic in comics" :key="comic.id" :title="comic.title" :chapter="getLatestChapter(comic)"
                 :bg="getCoverUrl(comic)"
@@ -45,9 +50,11 @@ let refreshInterval = null
 // Загрузка комиксов из MongoDB
 const fetchComics = async () => {
     try {
+        console.log('Загрузка комиксов...')
         const response = await axios.get('http://localhost:8080/api/comics/all')
         comics.value = response.data
         console.log('Загружено комиксов:', comics.value.length)
+        console.log('Первый комикс:', comics.value[0]) // Отладка
     } catch (error) {
         console.error('Ошибка загрузки комиксов:', error)
     } finally {
@@ -57,14 +64,21 @@ const fetchComics = async () => {
 
 // Получение URL обложки
 const getCoverUrl = (comic) => {
+    console.log('getCoverUrl для комикса:', comic.title, 'coverImageId:', comic.coverImageId)
     if (comic.coverImageId) {
-        return `http://localhost:8080/api/comics/files/${comic.coverImageId}`
+        const url = `http://localhost:8080/api/comics/files/${comic.coverImageId}`
+        console.log('URL обложки:', url)
+        return url
     }
+    console.log('Нет coverImageId, используем заглушку')
     return '/imagePage/comic-list/default-cover.jpg'
 }
 
-// Получение последней главы
+// Получение номера главы
 const getLatestChapter = (comic) => {
+    if (comic.chapterNumber) {
+        return comic.chapterNumber
+    }
     return comic.year || 1
 }
 
@@ -84,38 +98,37 @@ const loadFavorites = () => {
     const saved = localStorage.getItem('favoriteComics')
     if (saved) {
         favorites.value = new Set(JSON.parse(saved))
+        console.log('Загружено избранное:', [...favorites.value])
     }
 }
 
 // Добавление/удаление из избранного
 const toggleFavorite = (comicId) => {
+    console.log('Toggle favorite для комикса:', comicId)
     if (favorites.value.has(comicId)) {
         favorites.value.delete(comicId)
     } else {
         favorites.value.add(comicId)
     }
     localStorage.setItem('favoriteComics', JSON.stringify([...favorites.value]))
+    console.log('Избранное обновлено:', [...favorites.value])
 }
 
 // Слушаем событие публикации нового комикса
 const handleNewComic = (event) => {
     console.log('Новый комикс опубликован:', event.detail)
-    fetchComics() // Перезагружаем список комиксов
+    fetchComics()
 }
 
 onMounted(() => {
+    console.log('Component mounted')
     fetchComics()
     loadFavorites()
-
-    // Слушаем кастомное событие 'comic-published'
     window.addEventListener('comic-published', handleNewComic)
-
-    // Опционально: обновляем список каждые 30 секунд
     refreshInterval = setInterval(fetchComics, 30000)
 })
 
 onUnmounted(() => {
-    // Очищаем слушатели при уничтожении компонента
     window.removeEventListener('comic-published', handleNewComic)
     if (refreshInterval) {
         clearInterval(refreshInterval)
@@ -124,5 +137,43 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Ваши стили */
+.overflow-x-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #333;
+    padding-bottom: 10px;
+}
+
+.overflow-x-auto::-webkit-scrollbar {
+    height: 8px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+    background: #333;
+    border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
 </style>

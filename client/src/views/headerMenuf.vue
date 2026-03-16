@@ -11,7 +11,7 @@
                     <div class="bg-gray-500 w-[259px] h-[72px]"></div>
                     <h3 class="text-white mt-30">Загрузить комикс</h3>
 
-                    <!-- Титульник -->
+                    <!-- Титульник (Название) -->
                     <div
                         class="flex items-center bg-[#D2D2D2] text-white py-1 px-3 mt-12 w-[600px] h-[45px] rounded-full">
                         <textarea v-model="form.title" @input="updateCharacterCount1"
@@ -27,7 +27,7 @@
                             <span class="title title text-black">Описание</span>
                         </div>
                         <textarea v-model="form.description" class="text-area bg-white text-black"
-                            placeholder="Про что-то бла бла бла"></textarea>
+                            placeholder="Про что-то бла бла бла" rows="4"></textarea>
                     </div>
 
                     <!-- Теги -->
@@ -44,6 +44,14 @@
                                 <button @click="removeTag(index)" class="close-btn">X</button>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Номер Главы -->
+                    <div
+                        class="flex items-center bg-[#D2D2D2] text-white py-1 px-3 mt-12 w-[600px] h-[45px] rounded-full">
+                        <input v-model.number="form.chapterNumber" type="number" min="1"
+                            class="w-full h-full bg-[#D2D2D2] text-black p-2 rounded-full resize-none outline-none"
+                            placeholder="Номер главы*">
                     </div>
 
                     <!-- Переводчик -->
@@ -64,15 +72,15 @@
                         <span class="text-sm text-black ml-2">{{ charCount3 }}/100</span>
                     </div>
 
-                    <!-- Год (добавьте поле для года) -->
+                    <!-- Год выпуска -->
                     <div
                         class="flex items-center bg-[#D2D2D2] text-white py-1 px-3 mt-12 w-[600px] h-[45px] rounded-full">
-                        <input v-model.number="form.year" type="number"
+                        <input v-model.number="form.year" type="number" min="1900" :max="new Date().getFullYear()"
                             class="w-full h-full bg-[#D2D2D2] text-black p-2 rounded-full resize-none outline-none"
                             placeholder="Год выпуска">
                     </div>
 
-                    <!-- Кнопка -->
+                    <!-- Кнопка публикации -->
                     <div class="mt-12 flex justify-center">
                         <button @click="publishComic" :disabled="isPublishing"
                             class="flex items-center bg-[#D2D2D2] text-white py-1 px-3 rounded-full hover:bg-yellow-300 hover:scale-105 transition-all"
@@ -85,12 +93,12 @@
 
                 <!-- ПРАВАЯ КОЛОНКА -->
                 <div class="mt-80">
-                    <div class="flex justify-left gap-3 relative -top-6 ">
+                    <div class="flex justify-left gap-3 relative -top-6">
                         <img src="/imagePage/button-icon/upload-2-line.svg" alt="">
                         <p>обложка</p>
                     </div>
 
-                    <!-- Обложка -->
+                    <!-- Обложка с возможностью выбора -->
                     <div class="bg-gray-600 w-[440px] h-[660px] rounded-xl flex items-center justify-center relative group cursor-pointer overflow-hidden"
                         :class="{ 'border-4 border-yellow-500': showPageSelector }" @click="togglePageSelector">
                         <img v-if="selectedCover" :src="selectedCover" class="w-full h-full object-cover rounded-xl"
@@ -104,7 +112,7 @@
                         </div>
                     </div>
 
-                    <!-- Селектор страниц -->
+                    <!-- СЕЛЕКТОР СТРАНИЦ ДЛЯ ВЫБОРА ОБЛОЖКИ -->
                     <div v-if="showPageSelector && pdfPages.length > 0" class="mt-4 bg-[#464343] p-4 rounded-xl">
                         <p class="text-white mb-3">Выберите страницу для обложки:</p>
                         <div class="grid grid-cols-3 gap-2 max-h-[300px] overflow-y-auto">
@@ -120,6 +128,13 @@
                             class="mt-3 w-full bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 transition-colors">
                             Закрыть
                         </button>
+                    </div>
+
+                    <!-- Название комикса (предпросмотр) -->
+                    <div class="mt-3">
+                        <p class="text-white text-xl font-semibold break-words">
+                            {{ form.title || 'Название комикса' }}
+                        </p>
                     </div>
 
                     <!-- Загрузка PDF -->
@@ -138,49 +153,56 @@
                             {{ loading ? 'Пожалуйста, подождите...' : 'Drag and drop PDF here or click to upload' }}
                         </p>
                     </div>
+
+                    <!-- Информация о загруженном PDF -->
+                    <div v-if="pdfPages.length > 0" class="mt-4 text-white">
+                        <p>PDF загружен: {{ pdfPages.length }} страниц</p>
+                        <p v-if="selectedCoverIndex !== null">Обложка: страница {{ selectedCoverIndex + 1 }}</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Предпросмотр -->
+        <!-- Предпросмотр страниц -->
         <div class="bg-gray-800 h-[50px]"></div>
         <div class="bg-[#464343] h-[130px] ml-[200px] mr-[300px] flex justify-center items-center pt-12 gap-2">
-            <h1>Пред просмотр Страниц</h1>
+            <h1>Предпросмотр страниц</h1>
             <img src="/imagePage/headerMenu/eas.svg" alt="">
         </div>
         <div class="bg-gray-800 h-[50px]"></div>
 
-        <ComicP :chapterTitle="form.title || 'Название Главы'" :currentPage="1" :totalPages="pdfPages.length"
-            :pages="pdfPages"></ComicP>
+        <!-- Компонент для предпросмотра PDF -->
+        <ComicP v-if="pdfPages.length > 0" :chapterTitle="form.title || 'Название Главы'" :currentPage="1"
+            :totalPages="pdfPages.length" :pages="pdfPages">
+        </ComicP>
     </div>
 </template>
 
 <script setup>
 import { ref, reactive } from 'vue'
 import axios from 'axios'
-import ComicP from '../components/Page/comicP.vue'
+import { useRouter } from 'vue-router'
 import headerMenu from '../components/Page/headerMenu.vue'
+import ComicP from '../components/Page/comicP.vue'
 
-// Форма данных
+const router = useRouter()
+const isPublishing = ref(false)
+const loading = ref(false)
+const tagInput = ref('')
+
+// Данные формы
 const form = reactive({
     userId: "user123", // Замените на реальный ID пользователя
     title: '',
     description: '',
     tags: [],
+    chapterNumber: 1,
     year: new Date().getFullYear(),
     translator: '',
     artist: ''
 })
 
-// Вспомогательные поля
-const tagInput = ref('')
-const charCount1 = ref(0)
-const charCount2 = ref(0)
-const charCount3 = ref(0)
-
 // Данные для PDF и обложки
-const loading = ref(false)
-const isPublishing = ref(false)
 const pdfPages = ref([])
 const selectedCover = ref(null)
 const selectedCoverIndex = ref(null)
@@ -188,6 +210,10 @@ const showPageSelector = ref(false)
 const pdfFile = ref(null)
 
 // Счетчики символов
+const charCount1 = ref(0)
+const charCount2 = ref(0)
+const charCount3 = ref(0)
+
 function updateCharacterCount1() { charCount1.value = form.title.length }
 function updateCharacterCount2() { charCount2.value = form.translator.length }
 function updateCharacterCount3() { charCount3.value = form.artist.length }
@@ -195,11 +221,16 @@ function updateCharacterCount3() { charCount3.value = form.artist.length }
 // Теги
 function addTag() {
     if (tagInput.value.trim()) {
-        form.tags.push(tagInput.value.trim())
+        if (!form.tags.includes(tagInput.value.trim())) {
+            form.tags.push(tagInput.value.trim())
+        }
         tagInput.value = ''
     }
 }
-function removeTag(index) { form.tags.splice(index, 1) }
+
+function removeTag(index) {
+    form.tags.splice(index, 1)
+}
 
 // Загрузка PDF
 const triggerFileUpload = () => {
@@ -285,8 +316,16 @@ const publishComic = async () => {
         alert('Введите название комикса')
         return
     }
+    if (!form.chapterNumber) {
+        alert('Введите номер главы')
+        return
+    }
     if (!pdfFile.value) {
         alert('Загрузите PDF файл')
+        return
+    }
+    if (!selectedCover.value) {
+        alert('Выберите обложку')
         return
     }
 
@@ -300,6 +339,7 @@ const publishComic = async () => {
         formData.append('title', form.title)
         formData.append('description', form.description)
         formData.append('tags', form.tags.join(','))
+        formData.append('chapterNumber', form.chapterNumber)
         formData.append('year', form.year)
         formData.append('translator', form.translator || 'Свой комикс')
         formData.append('artist', form.artist || 'Неизвестен')
@@ -307,22 +347,29 @@ const publishComic = async () => {
         // Добавляем PDF
         formData.append('pdf', pdfFile.value)
 
-        // Добавляем обложку (если выбрана)
-        if (selectedCover.value) {
-            const coverFile = await base64ToFile(selectedCover.value, 'cover.jpg')
-            formData.append('cover', coverFile)
-        }
+        // Конвертируем обложку из base64 в файл
+        const coverFile = await base64ToFile(selectedCover.value, 'cover.jpg')
+        formData.append('cover', coverFile)
 
         // Отправляем запрос
         const response = await axios.post('http://localhost:8080/api/comics/create', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
 
-        console.log('Ответ сервера:', response.data)
-        alert(`Комикс успешно опубликован! ID: ${response.data.id}`)
+        console.log('Комикс опубликован:', response.data)
 
-        // Очищаем форму (опционально)
-        // resetForm()
+        // Отправляем событие о новом комиксе
+        window.dispatchEvent(new CustomEvent('comic-published', {
+            detail: response.data
+        }))
+
+        alert(`Комикс "${form.title}" (Глава ${form.chapterNumber}) успешно опубликован!`)
+
+        // Очищаем форму
+        resetForm()
+
+        // Переходим на главную страницу
+        router.push('/')
 
     } catch (error) {
         console.error('Ошибка при публикации:', error)
@@ -337,8 +384,11 @@ const resetForm = () => {
     form.title = ''
     form.description = ''
     form.tags = []
+    form.chapterNumber = 1
     form.translator = ''
     form.artist = ''
+    form.year = new Date().getFullYear()
+
     pdfPages.value = []
     selectedCover.value = null
     selectedCoverIndex.value = null
@@ -347,7 +397,7 @@ const resetForm = () => {
 </script>
 
 <style scoped>
-/* Это для ввода 2 (описнаие) */
+/* Стили для текстовых полей */
 .text-area::placeholder {
     color: #16181b;
     opacity: 1;
@@ -381,15 +431,17 @@ const resetForm = () => {
 
 .text-area {
     width: 100%;
-    height: 100px;
+    min-height: 100px;
     padding: 10px;
     font-size: 14px;
     border: 1px solid #777777;
     border-radius: 4px;
-    resize: none;
+    resize: vertical;
+    background-color: white;
+    color: black;
 }
 
-/* Это для Тегов стиль */
+/* Стили для тегов */
 .tags-container {
     display: flex;
     flex-wrap: wrap;
@@ -403,16 +455,23 @@ const resetForm = () => {
     margin: 5px;
     display: flex;
     align-items: center;
+    color: white;
 }
 
 .close-btn {
     background: none;
     border: none;
-    color: rgb(8, 8, 8);
+    color: white;
     cursor: pointer;
     margin-left: 8px;
+    font-weight: bold;
 }
 
+.close-btn:hover {
+    color: #ff4444;
+}
+
+/* Стили для состояний */
 .opacity-50 {
     opacity: 0.5;
     cursor: not-allowed;
@@ -435,6 +494,7 @@ const resetForm = () => {
     transition: opacity 0.3s ease;
 }
 
+/* Стили для скролла */
 .overflow-y-auto {
     scrollbar-width: thin;
     scrollbar-color: #888 #333;

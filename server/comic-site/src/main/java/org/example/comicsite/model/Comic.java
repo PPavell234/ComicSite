@@ -14,11 +14,12 @@ public class Comic {
     private String title;
     private String description;
     private List<String> tags;
+    private Integer chapterNumber;  // НОВОЕ ПОЛЕ - номер главы
     private Integer year;
     private String translator;
     private String artist;
-    private String coverImageId;      // ID обложки в GridFS
-    private String pdfFileId;          // ID PDF файла в GridFS
+    private String coverImageId;
+    private String pdfFileId;
     private LocalDateTime createdAt;
 
     public Comic() {
@@ -40,6 +41,9 @@ public class Comic {
 
     public List<String> getTags() { return tags; }
     public void setTags(List<String> tags) { this.tags = tags; }
+
+    public Integer getChapterNumber() { return chapterNumber; }  // НОВЫЙ ГЕТТЕР
+    public void setChapterNumber(Integer chapterNumber) { this.chapterNumber = chapterNumber; }  // НОВЫЙ СЕТТЕР
 
     public Integer getYear() { return year; }
     public void setYear(Integer year) { this.year = year; }
