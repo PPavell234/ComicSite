@@ -1,15 +1,14 @@
 package org.example.comicsite.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.comicsite.model.Comic;
 import org.example.comicsite.repository.ComicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -22,43 +21,63 @@ public class ComicController {
     @Autowired
     private GridFsTemplate gridFsTemplate;
 
-    @PostMapping("/create")
-    public String createComic(@RequestBody Comic comic) {  // Только JSON, без файлов
-        // Пока просто сохраняем JSON данные
-        Comic savedComic = comicRepository.save(comic);
-        return "{\"message\": \"Комикс сохранен без файлов\", \"id\": \"" + savedComic.getId() + "\"}";
-    }
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    // Отдельный метод для загрузки файлов
-    @PostMapping("/upload-files/{comicId}")
-    public String uploadFiles(
-            @PathVariable String comicId,
+    // 1. СОЗДАНИЕ КОМИКСА С ФАЙЛАМИ (ОДНИМ ЗАПРОСОМ)
+    @PostMapping(value = "/create", consumes = {"multipart/form-data"})
+    public Comic createComicWithFiles(
+            @RequestParam("comic") String comicJson,
             @RequestParam("cover") MultipartFile cover,
             @RequestParam("pdf") MultipartFile pdf) throws IOException {
 
-        // Находим комикс
-        Comic comic = comicRepository.findById(comicId)
-                .orElseThrow(() -> new RuntimeException("Комикс не найден"));
+        // 1. Парсим JSON в объект Comic
+        Comic comic = objectMapper.readValue(comicJson, Comic.class);
 
-        // Сохраняем файлы и обновляем комикс
-        String coverId = gridFsTemplate.store(cover.getInputStream(), cover.getOriginalFilename(), cover.getContentType()).toString();
-        String pdfId = gridFsTemplate.store(pdf.getInputStream(), pdf.getOriginalFilename(), pdf.getContentType()).toString();
+        // 2. Сохраняем обложку в GridFS
+        String coverId = gridFsTemplate.store(
+                cover.getInputStream(),
+                cover.getOriginalFilename(),
+                cover.getContentType()
+        ).toString();
 
+        // 3. Сохраняем PDF в GridFS
+        String pdfId = gridFsTemplate.store(
+                pdf.getInputStream(),
+                pdf.getOriginalFilename(),
+                pdf.getContentType()
+        ).toString();
+
+        // 4. Устанавливаем ID файлов в комикс
         comic.setCoverImageId(coverId);
         comic.setPdfFileId(pdfId);
-        comicRepository.save(comic);
 
-        return "{\"message\": \"Файлы загружены\"}";
+        // 5. Сохраняем комикс в БД
+        return comicRepository.save(comic);
     }
 
-    @Autowired
-    private MongoTemplate mongoTemplate;
+    // 2. ПОЛУЧИТЬ ВСЕ КОМИКСЫ
+    @GetMapping("/all")
+    public List<Comic> getAllComics() {
+        return comicRepository.findAll();
+    }
 
-    @GetMapping("/debug-db")
-    public String debugDatabase() {
-        String dbName = mongoTemplate.getDb().getName();
-        String collectionName = mongoTemplate.getCollectionName(Comic.class);
+    // 3. ПОЛУЧИТЬ КОМИКС ПО ID
+    @GetMapping("/{id}")
+    public Comic getComicById(@PathVariable String id) {
+        return comicRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Комикс не найден"));
+    }
 
-        return "Используется БД: " + dbName + ", коллекция: " + collectionName;
+    // 4. ПОЛУЧИТЬ ФАЙЛ ПО ID
+    @GetMapping("/file/{fileId}")
+    public String getFileInfo(@PathVariable String fileId) {
+        return "Файл с ID: " + fileId + " (нужно реализовать скачивание)";
+    }
+
+    // 5. ТЕСТОВЫЙ МЕТОД
+    @GetMapping("/test")
+    public String test() {
+        return "{\"status\": \"OK\", \"message\": \"Сервер работает\"}";
     }
 }

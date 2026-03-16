@@ -17,8 +17,8 @@ public class Comic {
     private Integer year;
     private String translator;
     private String artist;
-    private String coverImageId;
-    private String pdfFileId;
+    private String coverImageId;      // ID обложки в GridFS
+    private String pdfFileId;          // ID PDF файла в GridFS
     private LocalDateTime createdAt;
 
     public Comic() {
