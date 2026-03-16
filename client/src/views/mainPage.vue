@@ -19,12 +19,11 @@
 
             <!-- Реальные комиксы из БД -->
             <comic-title v-for="comic in comics" :key="comic.id" :title="comic.title" :chapter="getLatestChapter(comic)"
-                :bg="getCoverUrl(comic)"
-                :favorite="isFavorite(comic.id) ? '/imagePage/comic-list/Favorite.svg' : '/imagePage/comic-list/NotFavorite.svg'"
-                @click="goToComic(comic.id)" @toggle-favorite="toggleFavorite(comic.id)" />
+                :bg="getCoverUrl(comic)" :favorite="isFavorite(comic.id)" :comic-id="comic.id"
+                @click="goToComic(comic.id)" @toggle-favorite="toggleFavorite" />
         </div>
 
-        <!-- Пустое простартсво-->
+        <!-- Пустое пространство-->
         <div class="h-[25px] flex items-center justify-start mx-auto pl-23 gap-12"></div>
 
         <!-- News page -->
@@ -54,7 +53,6 @@ const fetchComics = async () => {
         const response = await axios.get('http://localhost:8080/api/comics/all')
         comics.value = response.data
         console.log('Загружено комиксов:', comics.value.length)
-        console.log('Первый комикс:', comics.value[0]) // Отладка
     } catch (error) {
         console.error('Ошибка загрузки комиксов:', error)
     } finally {
@@ -64,13 +62,9 @@ const fetchComics = async () => {
 
 // Получение URL обложки
 const getCoverUrl = (comic) => {
-    console.log('getCoverUrl для комикса:', comic.title, 'coverImageId:', comic.coverImageId)
     if (comic.coverImageId) {
-        const url = `http://localhost:8080/api/comics/files/${comic.coverImageId}`
-        console.log('URL обложки:', url)
-        return url
+        return `http://localhost:8080/api/comics/files/${comic.coverImageId}`
     }
-    console.log('Нет coverImageId, используем заглушку')
     return '/imagePage/comic-list/default-cover.jpg'
 }
 
@@ -111,7 +105,6 @@ const toggleFavorite = (comicId) => {
         favorites.value.add(comicId)
     }
     localStorage.setItem('favoriteComics', JSON.stringify([...favorites.value]))
-    console.log('Избранное обновлено:', [...favorites.value])
 }
 
 // Слушаем событие публикации нового комикса
@@ -120,6 +113,7 @@ const handleNewComic = (event) => {
     fetchComics()
 }
 
+// При монтировании компонента
 onMounted(() => {
     console.log('Component mounted')
     fetchComics()
@@ -128,6 +122,7 @@ onMounted(() => {
     refreshInterval = setInterval(fetchComics, 30000)
 })
 
+// При размонтировании компонента
 onUnmounted(() => {
     window.removeEventListener('comic-published', handleNewComic)
     if (refreshInterval) {
