@@ -23,13 +23,12 @@
                 @click="goToComic(comic.id)" @toggle-favorite="toggleFavorite" />
         </div>
 
+        <NewsP></NewsP>
+
         <!-- Пустое пространство-->
         <div class="h-[25px] flex items-center justify-start mx-auto pl-23 gap-12"></div>
 
-        <!-- News page -->
-        <div class="bg-[#353333] h-[110px] max-w-[1450px] mx-auto relative">
-            <img src="/imagePage/NewsPage/NewsPage.png" alt="" class="w-full h-full object-cover">
-        </div>
+
     </div>
 </template>
 
@@ -39,6 +38,7 @@ import { useRouter } from 'vue-router'
 import axios from 'axios'
 import HeaderMenu from '../components/Page/headerMenu.vue'
 import comicTitle from '../components/Page/comicTitle.vue'
+import NewsP from '../components/Page/newsP.vue'
 
 const router = useRouter()
 const comics = ref([])

@@ -15,7 +15,8 @@
                 class="absolute top-2 left-2 z-10 w-6 h-6 hover:scale-110 transition">
                 <!-- Картинка Favorite.svg с изменяемым цветом через CSS фильтр -->
                 <img :src="'/imagePage/comic-list/Favorite.svg'" alt="favorite"
-                    class="w-full h-full transition-all duration-300" :class="{ 'favorite-active': isFavorite }">
+                    class="w-full h-full transition-all duration-300"
+                    :class="{ 'favorite-active': isFavorite, 'favorite-inactive': !isFavorite }">
             </button>
 
             <!-- Номер главы -->
@@ -82,13 +83,28 @@ const onImageLoad = () => {
 </script>
 
 <style scoped>
-.favorite-active {
-    filter: invert(85%) sepia(50%) saturate(1000%) hue-rotate(330deg) brightness(100%) contrast(100%);
+/* Черный цвет для неактивной звезды */
+.favorite-inactive {
+    filter: brightness(0) invert(0);
+    /* Черный цвет */
+    opacity: 0.7;
+    /* Немного прозрачности для красоты */
 }
 
+/* Желтый цвет для активной звезды */
+.favorite-active {
+    filter: brightness(0) saturate(100%) invert(89%) sepia(25%) saturate(1000%) hue-rotate(350deg) brightness(104%) contrast(101%);
+}
 
 /* Эффект при наведении */
+.favorite-inactive:hover {
+    filter: brightness(0) invert(0);
+    opacity: 1;
+    transform: scale(1.1);
+}
+
 .favorite-active:hover {
     filter: brightness(0) saturate(100%) invert(89%) sepia(50%) saturate(2000%) hue-rotate(340deg) brightness(110%) contrast(105%);
+    transform: scale(1.1);
 }
 </style>

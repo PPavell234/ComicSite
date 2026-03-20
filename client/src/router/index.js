@@ -9,6 +9,7 @@ import MainPage from "../views/mainPage.vue";
 import HeaderMenuf from "../views/headerMenuf.vue";
 import HeaderMenu from "../components/Page/headerMenu.vue";
 import ComicTitle from "../components/Page/comicTitle.vue";
+import NewsP from "../components/Page/newsP.vue";
 
 const routes = [
   //Комонент
@@ -52,6 +53,11 @@ const routes = [
     path: "/title",
     name: "comicTitle",
     component: ComicTitle,
+  },
+  {
+    path: "/news",
+    name: "NewsP",
+    component: NewsP,
   },
 ];
 
