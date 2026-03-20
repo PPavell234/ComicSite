@@ -66,6 +66,12 @@ const routes = [
     name: "ComicReader",
     component: ComicReader,
   },
+  //Комметарии для комикса
+  {
+    path: "/comicСomment",
+    name: "ComicReader",
+    component: Comment,
+  },
 ];
 
 const router = createRouter({
