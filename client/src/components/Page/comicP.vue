@@ -23,10 +23,12 @@
         </div>
 
         <!-- Центральный контент -->
-        <div class="mt-17 w-full flex items-center justify-between">
-            <div><!-- пусто слева --></div>
+        <div class="w-full flex">
+            <!-- Левая область (черный фон) -->
+            <div class="bg-black w-120 flex-shrink-0"></div>
 
-            <div class="bg-[#353333] px-[500px] py-8 h-[1100px] relative flex items-center justify-center">
+            <!-- Центральная область с контентом -->
+            <div class="flex-1  bg-[#353333] h-[1100px] relative flex items-center justify-center">
                 <!-- Отображение текущей страницы PDF с областями для перелистывания -->
                 <div v-if="pages && pages.length > 0"
                     class="reader-container w-full h-full flex items-center justify-center">
@@ -50,31 +52,80 @@
                 <slot name="content" v-else></slot>
             </div>
 
-            <div><!-- пусто справа --></div>
+            <!-- Правая область (черный фон) -->
+            <div class="bg-black w-120 flex-shrink-0"></div>
         </div>
-
         <!-- Нижний блок с пагинацией - ПОКАЗЫВАЕТ ТЕКУЩУЮ СТРАНИЦУ И ВСЕГО СТРАНИЦ В ФАЙЛЕ -->
-        <div class="mt-12 flex items-center justify-center text-white">
-            <div class="pagination-controls flex items-center gap-4 bg-[#464343] px-6 py-2 rounded-full">
-                <button @click="prevPage" :disabled="currentPageIndex === 0" class="pagination-btn text-xl font-bold"
-                    :class="{ 'opacity-50 cursor-not-allowed': currentPageIndex === 0 }">
-                    ←
-                </button>
-
-                <span class="text-lg">
-                    {{ currentPageIndex + 1 }} / {{ pages.length }}
-                </span>
-
-                <button @click="nextPage" :disabled="currentPageIndex === pages.length - 1"
-                    class="pagination-btn text-xl font-bold"
-                    :class="{ 'opacity-50 cursor-not-allowed': currentPageIndex === pages.length - 1 }">
-                    →
-                </button>
-            </div>
+        <div class="text-white pt-12  pb-12 flex items-center justify-center  w-full flex gap-4 bg-[black]">
+            <span class="text-lg ">
+                {{ currentPageIndex + 1 }} / {{ pages.length }}
+            </span>
         </div>
 
-        <div class="mt-60"></div>
+
+        <!-- Комментарии -->
+        <div class="flex flex-row bg-black text-white gap-4 justify-end pr-80">
+            <span class="flex items-center gap-2 bg-[#353333] p-2 rounded">
+                <div class="mr-4"></div>
+                <img src="/comicP/IconEm.svg" alt="">
+                <p>Правила</p>
+                <div class="mr-4"></div>
+            </span>
+        </div>
+        <div class="w-full flex">
+            <!-- Левая область (черный фон) -->
+            <div class="bg-black w-90 flex-shrink-0"></div>
+
+
+
+            <!-- Центральная область с контентом -->
+            <div class="flex-1 bg-black h-[1100px] ">
+                <div class="bg-[#353333] p-3 mt-12 mr-12 ml-12 text-white ">Написать комментарий</div>
+
+                <!-- Формат комментария -->
+                <div class="flex justify-between items-start text-white mt-12">
+                    <!-- Левая часть: всё кроме лайков -->
+                    <div class="flex-1 ml-12">
+                        <div class="flex items-center gap-2">
+                            <img src="/comicP/ProfileIcon.svg" alt="">
+                            <p>Имя</p>
+                            <p class="ml-4 text-[#353333]">2 месяца назад</p>
+                        </div>
+                        <div class="mt-2">
+                            <p>бюджет 144р</p>
+                        </div>
+                        <div class="flex items-center gap-6 mt-2 text-red-500">
+                            <p>Ответить</p>
+                            <p>Жалоба</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-12 mr-12">
+                        <!-- Элемент слева (текст снизу) -->
+                        <div class="flex flex-col items-center gap-1">
+                            <img src="/comicP/dislike.svg" alt="">
+                            <p>0</p>
+                        </div>
+
+                        <!-- Элемент справа (лайк снизу) -->
+                        <div class="flex flex-col items-center gap-1">
+                            <img src="/comicP/like.svg" alt="">
+                            <p>0</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Правая область (черный фон) -->
+            <div class="bg-black w-90 flex-shrink-0"></div>
+        </div>
+
+
     </div>
+
+
+
 </template>
 
 <script>
@@ -202,12 +253,6 @@ export default {
     opacity: 0.3;
 }
 
-/* Стили для нижней пагинации */
-.pagination-controls {
-    background-color: #464343;
-    border-radius: 9999px;
-    padding: 0.5rem 1.5rem;
-}
 
 .pagination-btn {
     background: none;
