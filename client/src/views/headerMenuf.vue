@@ -14,7 +14,7 @@
                     <!-- Титульник (Название) -->
                     <div
                         class="flex items-center bg-[#D2D2D2] text-white py-1 px-3 mt-12 w-[600px] h-[45px] rounded-full">
-                        <textarea v-model="form.title" @input="updateCharacterCount1"
+                        <textarea v-model="form.title" @input="updateCharacterCoaunt1"
                             class="w-full h-full bg-[#D2D2D2] text-black p-2 rounded-full resize-none outline-none"
                             placeholder="Титульник(Название)*" maxlength="100"></textarea>
                         <span class="text-sm text-black ml-2">{{ charCount1 }}/100</span>

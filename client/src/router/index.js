@@ -10,6 +10,7 @@ import HeaderMenuf from "../views/headerMenuf.vue";
 import HeaderMenu from "../components/Page/headerMenu.vue";
 import ComicTitle from "../components/Page/comicTitle.vue";
 import NewsP from "../components/Page/newsP.vue";
+import ComicReader from "../components/Page/ComicReader.vue";
 
 const routes = [
   //Комонент
@@ -58,6 +59,12 @@ const routes = [
     path: "/news",
     name: "NewsP",
     component: NewsP,
+  },
+  //Машрут для чтения комикса
+  {
+    path: "/comic/:id/read",
+    name: "ComicReader",
+    component: ComicReader,
   },
 ];
 

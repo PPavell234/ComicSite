@@ -84,7 +84,7 @@ const isFavorite = (comicId) => {
 // Переход на страницу комикса
 const goToComic = (comicId) => {
     console.log('Переход к комиксу с ID:', comicId)
-    router.push(`/comic/${comicId}`)
+    router.push(`/comic/${comicId}/read`)  // Переход на страницу чтения
 }
 
 // Загрузка избранного

@@ -3,6 +3,8 @@ package org.example.comicsite.controller;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
 import org.apache.pdfbox.io.IOUtils;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.bson.types.ObjectId;
 import org.example.comicsite.model.Comic;
 import org.example.comicsite.repository.ComicRepository;
@@ -19,11 +21,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/comics")
@@ -38,6 +41,54 @@ public class ComicController {
 
     @Autowired
     private MongoDatabaseFactory mongoDatabaseFactory;
+
+    // ПОЛУЧИТЬ КОМИКС ПО ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Comic> getComicById(@PathVariable String id) {
+        System.out.println("Запрос комикса с ID: " + id);
+
+        return comicRepository.findById(id)
+                .map(comic -> {
+                    System.out.println("Комикс найден: " + comic.getTitle());
+                    return ResponseEntity.ok(comic);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+    // Быстаря загрузка комикса
+    @PostMapping("/upload-pdf")
+    public ResponseEntity<?> uploadPdf(@RequestParam("file") MultipartFile file) {
+        try {
+            PDDocument document = PDDocument.load(file.getInputStream());
+            PDFRenderer pdfRenderer = new PDFRenderer(document);
+            List<String> pageIds = new ArrayList<>();
+
+            // Конвертируем каждую страницу и сохраняем в GridFS
+            for (int page = 0; page < document.getNumberOfPages(); page++) {
+                BufferedImage image = pdfRenderer.renderImageWithDPI(page, 150);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(image, "jpg", baos);
+
+                // Сохраняем страницу в GridFS
+                ObjectId pageId = gridFsTemplate.store(
+                        new ByteArrayInputStream(baos.toByteArray()),
+                        "page_" + page + ".jpg",
+                        "image/jpeg"
+                );
+                pageIds.add(pageId.toString());
+            }
+
+            document.close();
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("pageIds", pageIds);
+            response.put("totalPages", pageIds.size());
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Ошибка: " + e.getMessage());
+        }
+    }
 
     // СОЗДАНИЕ КОМИКСА
     @PostMapping(value = "/create", consumes = {"multipart/form-data"})

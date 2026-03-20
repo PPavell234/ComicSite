@@ -28,51 +28,35 @@ public class PdfController {
     private static final String UPLOAD_DIR = "uploads";
     private static final int DPI = 150;
 
+    //Очищяем фалы
+    @DeleteMapping("/temp-file/{filename}")
+    public ResponseEntity<?> deleteTempFile(@PathVariable String filename) {
+        try {
+            Path filePath = Paths.get(UPLOAD_DIR, filename);
+            Files.deleteIfExists(filePath);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @PostMapping("/upload-pdf")
     public ResponseEntity<?> uploadPdf(@RequestParam("file") MultipartFile file) {
         Map<String, Object> response = new HashMap<>();
 
-        if (file.isEmpty()) {
-            response.put("error", "Файл не выбран");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-
-        String originalFilename = file.getOriginalFilename();
-        if (originalFilename == null || !originalFilename.toLowerCase().endsWith(".pdf")) {
-            response.put("error", "Файл должен быть в формате PDF");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-
-        Path uploadPath = Paths.get(UPLOAD_DIR);
-        PDDocument document = null;
-
         try {
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
+            logger.info("Обработка PDF файла: {}", file.getOriginalFilename());
 
-            logger.info("Обработка PDF файла: {}", originalFilename);
-
-            document = PDDocument.load(file.getInputStream());
+            // Загружаем PDF в память
+            PDDocument document = PDDocument.load(file.getInputStream());
+            PDFRenderer pdfRenderer = new PDFRenderer(document);
 
             int numberOfPages = document.getNumberOfPages();
-
-            if (numberOfPages == 0) {
-                response.put("error", "PDF файл не содержит страниц");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
-
-            // Сохраняем файл
-            String uniqueFilename = System.currentTimeMillis() + "_" + originalFilename;
-            Path filePath = uploadPath.resolve(uniqueFilename);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            // Конвертируем все страницы в Base64
-            PDFRenderer pdfRenderer = new PDFRenderer(document);
             List<String> pagesBase64 = new ArrayList<>();
 
+            // Конвертируем страницы в Base64 (без сохранения на диск)
             for (int page = 0; page < numberOfPages; page++) {
-                BufferedImage image = pdfRenderer.renderImageWithDPI(page, DPI);
+                BufferedImage image = pdfRenderer.renderImageWithDPI(page, 150);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ImageIO.write(image, "png", baos);
                 byte[] imageBytes = baos.toByteArray();
@@ -82,10 +66,11 @@ public class PdfController {
                 logger.debug("Страница {} сконвертирована", page + 1);
             }
 
+            document.close();
+
             response.put("message", "Файл успешно обработан");
-            response.put("filename", uniqueFilename);
             response.put("totalPages", numberOfPages);
-            response.put("pages", pagesBase64); // Возвращаем массив страниц
+            response.put("pages", pagesBase64);
 
             return ResponseEntity.ok(response);
 
@@ -93,15 +78,6 @@ public class PdfController {
             logger.error("Ошибка при обработке PDF: {}", e.getMessage(), e);
             response.put("error", "Ошибка при обработке PDF: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-
-        } finally {
-            if (document != null) {
-                try {
-                    document.close();
-                } catch (IOException e) {
-                    logger.error("Ошибка при закрытии документа: {}", e.getMessage());
-                }
-            }
         }
     }
 
