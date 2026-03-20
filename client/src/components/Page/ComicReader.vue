@@ -31,7 +31,7 @@ import ComicP from './comicP.vue'
 const route = useRoute()
 const comicId = route.params.id
 const comicTitle = ref('')
-const pdfPages = ref([])
+const pdfPages = ref([])      // <-- исправлено: было pageUrls, нужно pdfPages
 const loading = ref(true)
 const error = ref(null)
 const progress = ref(0)
@@ -44,7 +44,11 @@ const loadComic = async () => {
     progress.value = 0
 
     try {
+        console.log('Загрузка комикса с ID:', comicId)
+
+        // Проверяем кэш
         if (memoryCache.has(comicId)) {
+            console.log('Загружаем из кэша')
             const cached = memoryCache.get(comicId)
             comicTitle.value = cached.title
             pdfPages.value = cached.pages
@@ -53,48 +57,43 @@ const loadComic = async () => {
             return
         }
 
+        progress.value = 30
+
+        // Получаем комикс с готовыми страницами
         const response = await axios.get(`http://localhost:8080/api/comics/${comicId}`)
         const comic = response.data
         comicTitle.value = comic.title || 'Комикс'
 
-        if (!comic.pdfFileId) {
-            throw new Error('У комикса нет PDF файла')
-        }
+        progress.value = 60
 
-        progress.value = 20
+        console.log('PageImageIds:', comic.pageImageIds)
 
-        const pdfResponse = await axios.get(`http://localhost:8080/api/comics/files/${comic.pdfFileId}`, {
-            responseType: 'blob'
-        })
-
-        progress.value = 50
-
-        const formData = new FormData()
-        formData.append('file', pdfResponse.data, 'comic.pdf')
-
-        const convertResponse = await axios.post('http://localhost:8080/api/upload-pdf', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-            onUploadProgress: (progressEvent) => {
-                const percent = 50 + (progressEvent.loaded / progressEvent.total) * 50
-                progress.value = Math.round(percent)
-            }
-        })
-
-        if (convertResponse.data.pages && convertResponse.data.pages.length) {
-            pdfPages.value = convertResponse.data.pages
-            memoryCache.set(comicId, { title: comicTitle.value, pages: pdfPages.value })
+        // Просто берем готовые URL страниц
+        if (comic.pageImageIds && comic.pageImageIds.length) {
+            pdfPages.value = comic.pageImageIds.map(id =>
+                `http://localhost:8080/api/comics/files/${id}`
+            )
+            console.log('Загружено страниц:', pdfPages.value.length)
             progress.value = 100
+
+            // Сохраняем в кэш
+            memoryCache.set(comicId, {
+                title: comicTitle.value,
+                pages: pdfPages.value
+            })
         } else {
-            throw new Error('Не удалось конвертировать PDF в изображения')
+            throw new Error('У комикса нет страниц')
         }
 
     } catch (err) {
-        console.error('Ошибка:', err)
+        console.error('Ошибка загрузки комикса:', err)
         error.value = err.message || 'Не удалось загрузить комикс'
     } finally {
         loading.value = false
     }
 }
 
-onMounted(loadComic)
+onMounted(() => {
+    loadComic()
+})
 </script>

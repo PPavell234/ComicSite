@@ -21,10 +21,16 @@ public class Comic {
     private String coverImageId;
     private String pdfFileId;
     private LocalDateTime createdAt;
+    private List<String> pageImageIds;
+
 
     public Comic() {
         this.createdAt = LocalDateTime.now();
     }
+
+    public List<String> getPageImageIds() { return pageImageIds; }
+    public void setPageImageIds(List<String> pageImageIds) { this.pageImageIds = pageImageIds; }
+
 
     // Геттеры и сеттеры
     public String getId() { return id; }

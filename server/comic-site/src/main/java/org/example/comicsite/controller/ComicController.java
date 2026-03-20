@@ -26,11 +26,16 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/comics")
-@CrossOrigin(origins = "http://localhost:5173") // Важно для CORS!
+@CrossOrigin(origins = "http://localhost:5173")
 public class ComicController {
 
     @Autowired
@@ -42,55 +47,7 @@ public class ComicController {
     @Autowired
     private MongoDatabaseFactory mongoDatabaseFactory;
 
-    // ПОЛУЧИТЬ КОМИКС ПО ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Comic> getComicById(@PathVariable String id) {
-        System.out.println("Запрос комикса с ID: " + id);
-
-        return comicRepository.findById(id)
-                .map(comic -> {
-                    System.out.println("Комикс найден: " + comic.getTitle());
-                    return ResponseEntity.ok(comic);
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-    // Быстаря загрузка комикса
-    @PostMapping("/upload-pdf")
-    public ResponseEntity<?> uploadPdf(@RequestParam("file") MultipartFile file) {
-        try {
-            PDDocument document = PDDocument.load(file.getInputStream());
-            PDFRenderer pdfRenderer = new PDFRenderer(document);
-            List<String> pageIds = new ArrayList<>();
-
-            // Конвертируем каждую страницу и сохраняем в GridFS
-            for (int page = 0; page < document.getNumberOfPages(); page++) {
-                BufferedImage image = pdfRenderer.renderImageWithDPI(page, 150);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ImageIO.write(image, "jpg", baos);
-
-                // Сохраняем страницу в GridFS
-                ObjectId pageId = gridFsTemplate.store(
-                        new ByteArrayInputStream(baos.toByteArray()),
-                        "page_" + page + ".jpg",
-                        "image/jpeg"
-                );
-                pageIds.add(pageId.toString());
-            }
-
-            document.close();
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("pageIds", pageIds);
-            response.put("totalPages", pageIds.size());
-
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Ошибка: " + e.getMessage());
-        }
-    }
-
-    // СОЗДАНИЕ КОМИКСА
+    // СОЗДАНИЕ КОМИКСА С СОХРАНЕНИЕМ СТРАНИЦ
     @PostMapping(value = "/create", consumes = {"multipart/form-data"})
     public ResponseEntity<?> createComic(
             @RequestParam("userId") String userId,
@@ -108,27 +65,47 @@ public class ComicController {
             System.out.println("=== СОЗДАНИЕ КОМИКСА ===");
             System.out.println("Title: " + title);
             System.out.println("Chapter: " + chapterNumber);
-            System.out.println("Cover file: " + coverFile.getOriginalFilename());
-            System.out.println("Cover size: " + coverFile.getSize());
-            System.out.println("PDF file: " + pdfFile.getOriginalFilename());
 
             // 1. Сохраняем обложку в GridFS
-            ObjectId coverId = gridFsTemplate.store(
+            String coverId = gridFsTemplate.store(
                     coverFile.getInputStream(),
                     coverFile.getOriginalFilename(),
                     coverFile.getContentType()
-            );
-            System.out.println("Cover saved with ID: " + coverId.toString());
+            ).toString();
+            System.out.println("Cover saved with ID: " + coverId);
 
             // 2. Сохраняем PDF в GridFS
-            ObjectId pdfId = gridFsTemplate.store(
+            String pdfId = gridFsTemplate.store(
                     pdfFile.getInputStream(),
                     pdfFile.getOriginalFilename(),
                     pdfFile.getContentType()
-            );
-            System.out.println("PDF saved with ID: " + pdfId.toString());
+            ).toString();
+            System.out.println("PDF saved with ID: " + pdfId);
 
-            // 3. Создаем комикс
+            // 3. Конвертируем PDF в страницы и сохраняем в GridFS
+            List<String> pageImageIds = new ArrayList<>();
+            try (PDDocument document = PDDocument.load(pdfFile.getInputStream())) {
+                PDFRenderer pdfRenderer = new PDFRenderer(document);
+                int totalPages = document.getNumberOfPages();
+                System.out.println("Всего страниц для конвертации: " + totalPages);
+
+                for (int page = 0; page < totalPages; page++) {
+                    System.out.println("Конвертация страницы " + (page + 1));
+                    BufferedImage image = pdfRenderer.renderImageWithDPI(page, 150);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ImageIO.write(image, "jpg", baos);
+
+                    ObjectId pageId = gridFsTemplate.store(
+                            new ByteArrayInputStream(baos.toByteArray()),
+                            "page_" + (page + 1) + ".jpg",
+                            "image/jpeg"
+                    );
+                    pageImageIds.add(pageId.toString());
+                }
+                System.out.println("Все страницы сконвертированы: " + pageImageIds.size());
+            }
+
+            // 4. Создаем комикс
             Comic comic = new Comic();
             comic.setUserId(userId);
             comic.setTitle(title);
@@ -141,10 +118,11 @@ public class ComicController {
             comic.setYear(year);
             comic.setTranslator(translator);
             comic.setArtist(artist);
-            comic.setCoverImageId(coverId.toString());
-            comic.setPdfFileId(pdfId.toString());
+            comic.setCoverImageId(coverId);
+            comic.setPdfFileId(pdfId);
+            comic.setPageImageIds(pageImageIds);
 
-            // 4. Сохраняем в БД
+            // 5. Сохраняем в БД
             Comic savedComic = comicRepository.save(comic);
             System.out.println("Comic saved with ID: " + savedComic.getId());
 
@@ -152,8 +130,10 @@ public class ComicController {
             response.put("message", "Комикс успешно создан!");
             response.put("id", savedComic.getId());
             response.put("title", savedComic.getTitle());
-            response.put("coverImageId", coverId.toString());
-            response.put("pdfFileId", pdfId.toString());
+            response.put("coverImageId", coverId);
+            response.put("pdfFileId", pdfId);
+            response.put("pageImageIds", pageImageIds);
+            response.put("totalPages", pageImageIds.size());
 
             return ResponseEntity.ok(response);
 
@@ -179,13 +159,26 @@ public class ComicController {
         }
     }
 
-    // ПОЛУЧИТЬ ФАЙЛ ПО ID (ОБЛОЖКА)
+    // ПОЛУЧИТЬ КОМИКС ПО ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Comic> getComicById(@PathVariable String id) {
+        System.out.println("Запрос комикса с ID: " + id);
+
+        return comicRepository.findById(id)
+                .map(comic -> {
+                    System.out.println("Комикс найден: " + comic.getTitle());
+                    System.out.println("Страниц в комиксе: " + (comic.getPageImageIds() != null ? comic.getPageImageIds().size() : 0));
+                    return ResponseEntity.ok(comic);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // ПОЛУЧИТЬ ФАЙЛ ПО ID (обложка, страницы, PDF)
     @GetMapping("/files/{fileId}")
     public ResponseEntity<byte[]> getFile(@PathVariable String fileId) {
         try {
             System.out.println("Запрос файла с ID: " + fileId);
 
-            // Проверяем валидность ObjectId
             ObjectId objectId;
             try {
                 objectId = new ObjectId(fileId);
@@ -194,7 +187,6 @@ public class ComicController {
                 return ResponseEntity.badRequest().build();
             }
 
-            // Находим файл в GridFS
             var file = gridFsTemplate.findOne(
                     Query.query(Criteria.where("_id").is(objectId))
             );
@@ -205,28 +197,17 @@ public class ComicController {
             }
 
             System.out.println("Файл найден: " + file.getFilename());
-            System.out.println("Размер файла: " + file.getLength());
 
-            // Получаем GridFSBucket
             GridFSBucket gridFSBucket = GridFSBuckets.create(mongoDatabaseFactory.getMongoDatabase());
-
-            // Получаем InputStream и читаем байты
             byte[] bytes = IOUtils.toByteArray(gridFSBucket.openDownloadStream(objectId));
 
             HttpHeaders headers = new HttpHeaders();
-
-            // Определяем Content-Type
-            String contentType = "image/jpeg"; // по умолчанию
+            String contentType = "image/jpeg";
             if (file.getMetadata() != null && file.getMetadata().get("_contentType") != null) {
                 contentType = file.getMetadata().getString("_contentType");
             }
             headers.setContentType(MediaType.parseMediaType(contentType));
             headers.setContentLength(bytes.length);
-
-            // Добавляем заголовки для кэширования
-            headers.setCacheControl("max-age=3600");
-
-            System.out.println("Отправка файла: " + bytes.length + " байт, тип: " + contentType);
 
             return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
 
@@ -261,15 +242,8 @@ public class ComicController {
                     file.getMetadata().get("_contentType") : "unknown");
             result.put("uploadDate", file.getUploadDate());
 
-            // Пробуем прочитать первые байты для проверки
-            GridFSBucket gridFSBucket = GridFSBuckets.create(mongoDatabaseFactory.getMongoDatabase());
-            byte[] bytes = IOUtils.toByteArray(gridFSBucket.openDownloadStream(objectId));
-            result.put("bytesRead", bytes.length);
-            result.put("isReadable", true);
-
         } catch (Exception e) {
             result.put("error", e.getMessage());
-            result.put("errorType", e.getClass().getName());
         }
         return ResponseEntity.ok(result);
     }
