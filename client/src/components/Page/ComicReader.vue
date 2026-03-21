@@ -13,8 +13,9 @@
             <div class="text-red-500 text-xl">Ошибка загрузки: {{ error }}</div>
         </div>
 
-        <ComicP v-else-if="pdfPages.length > 0" :chapterTitle="comicTitle" :pages="pdfPages" :currentPage="1"
-            :totalPages="pdfPages.length" />
+        <!-- Компонент для чтения комикса - передаем comicId -->
+        <ComicP v-else-if="pdfPages.length > 0" :comicId="comicId" :chapterTitle="comicTitle" :pages="pdfPages"
+            :currentPage="1" :totalPages="pdfPages.length" />
 
         <div v-else class="bg-gray-800 min-h-screen flex items-center justify-center">
             <div class="text-white text-xl">Нет страниц для отображения</div>
@@ -31,10 +32,12 @@ import ComicP from './comicP.vue'
 const route = useRoute()
 const comicId = route.params.id
 const comicTitle = ref('')
-const pdfPages = ref([])      // <-- исправлено: было pageUrls, нужно pdfPages
+const pdfPages = ref([])
 const loading = ref(true)
 const error = ref(null)
 const progress = ref(0)
+
+console.log('comicId в ComicReader:', comicId)
 
 const memoryCache = new Map()
 

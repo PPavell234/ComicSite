@@ -7,9 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/comments")
@@ -19,23 +17,33 @@ public class CommentController {
     @Autowired
     private CommentRepository commentRepository;
 
-    // 1. ПОЛУЧИТЬ КОММЕНТАРИИ ПО ID КОМИКСА (с пагинацией 25)
     @GetMapping("/comic/{comicId}")
     public ResponseEntity<?> getCommentsByComic(
             @PathVariable String comicId,
-            @RequestParam(defaultValue = "0") int page) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "") String userId) {
 
         try {
-            // Получаем все комментарии комикса, отсортированные по дате (новые сверху)
             List<CommentDB> allComments = commentRepository.findByComicIdOrderByCreatedAtDesc(comicId);
-
-            // Пагинация: 25 комментариев на странице
             int start = page * 25;
             int end = Math.min(start + 25, allComments.size());
 
             List<CommentDB> paginatedComments;
             if (start < allComments.size()) {
                 paginatedComments = allComments.subList(start, end);
+
+                // Для каждого комментария добавляем информацию о реакции текущего пользователя
+                if (!userId.isEmpty()) {
+                    for (CommentDB comment : paginatedComments) {
+                        String reaction = "none";
+                        if (comment.getLikedBy() != null && comment.getLikedBy().contains(userId)) {
+                            reaction = "like";
+                        } else if (comment.getDislikedBy() != null && comment.getDislikedBy().contains(userId)) {
+                            reaction = "dislike";
+                        }
+                        comment.setUserReaction(reaction);
+                    }
+                }
             } else {
                 paginatedComments = List.of();
             }
@@ -55,7 +63,6 @@ public class CommentController {
         }
     }
 
-    // 2. СОЗДАТЬ КОММЕНТАРИЙ
     @PostMapping("/create")
     public ResponseEntity<?> createComment(@RequestBody CommentDB comment) {
         try {
@@ -64,9 +71,11 @@ public class CommentController {
             comment.setLikes(0);
             comment.setDislikes(0);
             comment.setEdited(false);
+            comment.setLikedBy(new ArrayList<>());
+            comment.setDislikedBy(new ArrayList<>());
 
             if (comment.getReplies() == null) {
-                comment.setReplies(new java.util.ArrayList<>());
+                comment.setReplies(new ArrayList<>());
             }
 
             CommentDB saved = commentRepository.save(comment);
@@ -79,7 +88,6 @@ public class CommentController {
         }
     }
 
-    // 3. ДОБАВИТЬ ОТВЕТ НА КОММЕНТАРИЙ
     @PostMapping("/{commentId}/reply")
     public ResponseEntity<?> addReply(
             @PathVariable String commentId,
@@ -89,12 +97,12 @@ public class CommentController {
             CommentDB comment = commentRepository.findById(commentId)
                     .orElseThrow(() -> new RuntimeException("Комментарий не найден"));
 
+            reply.setId(UUID.randomUUID().toString());
             reply.setCreatedAt(LocalDateTime.now());
             comment.getReplies().add(reply);
             comment.setUpdatedAt(LocalDateTime.now());
 
             commentRepository.save(comment);
-
             return ResponseEntity.ok(reply);
 
         } catch (Exception e) {
@@ -104,20 +112,56 @@ public class CommentController {
         }
     }
 
-    // 4. ДОБАВИТЬ ЛАЙК/ДИЗЛАЙК
     @PostMapping("/{commentId}/reaction")
     public ResponseEntity<?> addReaction(
             @PathVariable String commentId,
-            @RequestParam boolean like) {
+            @RequestParam boolean like,
+            @RequestParam String userId) {
 
         try {
             CommentDB comment = commentRepository.findById(commentId)
                     .orElseThrow(() -> new RuntimeException("Комментарий не найден"));
 
+            // Проверяем, ставил ли пользователь уже реакцию
+            boolean alreadyLiked = comment.getLikedBy() != null && comment.getLikedBy().contains(userId);
+            boolean alreadyDisliked = comment.getDislikedBy() != null && comment.getDislikedBy().contains(userId);
+
             if (like) {
-                comment.setLikes(comment.getLikes() + 1);
+                // Если уже лайкнул - убираем лайк
+                if (alreadyLiked) {
+                    comment.setLikes(comment.getLikes() - 1);
+                    comment.getLikedBy().remove(userId);
+                }
+                // Если был дизлайк - убираем дизлайк и ставим лайк
+                else if (alreadyDisliked) {
+                    comment.setDislikes(comment.getDislikes() - 1);
+                    comment.getDislikedBy().remove(userId);
+                    comment.setLikes(comment.getLikes() + 1);
+                    comment.getLikedBy().add(userId);
+                }
+                // Нет реакции - ставим лайк
+                else {
+                    comment.setLikes(comment.getLikes() + 1);
+                    comment.getLikedBy().add(userId);
+                }
             } else {
-                comment.setDislikes(comment.getDislikes() + 1);
+                // Если уже дизлайкнул - убираем дизлайк
+                if (alreadyDisliked) {
+                    comment.setDislikes(comment.getDislikes() - 1);
+                    comment.getDislikedBy().remove(userId);
+                }
+                // Если был лайк - убираем лайк и ставим дизлайк
+                else if (alreadyLiked) {
+                    comment.setLikes(comment.getLikes() - 1);
+                    comment.getLikedBy().remove(userId);
+                    comment.setDislikes(comment.getDislikes() + 1);
+                    comment.getDislikedBy().add(userId);
+                }
+                // Нет реакции - ставим дизлайк
+                else {
+                    comment.setDislikes(comment.getDislikes() + 1);
+                    comment.getDislikedBy().add(userId);
+                }
             }
 
             commentRepository.save(comment);
@@ -125,6 +169,8 @@ public class CommentController {
             Map<String, Object> response = new HashMap<>();
             response.put("likes", comment.getLikes());
             response.put("dislikes", comment.getDislikes());
+            response.put("userLiked", comment.getLikedBy() != null && comment.getLikedBy().contains(userId));
+            response.put("userDisliked", comment.getDislikedBy() != null && comment.getDislikedBy().contains(userId));
 
             return ResponseEntity.ok(response);
 
@@ -135,13 +181,21 @@ public class CommentController {
         }
     }
 
-    // 5. УДАЛИТЬ КОММЕНТАРИЙ (только для админа/модератора)
+    private String getUserReaction(CommentDB comment, String userId) {
+        if (comment.getLikedBy() != null && comment.getLikedBy().contains(userId)) {
+            return "like";
+        }
+        if (comment.getDislikedBy() != null && comment.getDislikedBy().contains(userId)) {
+            return "dislike";
+        }
+        return "none";
+    }
+
     @DeleteMapping("/{commentId}")
     public ResponseEntity<?> deleteComment(@PathVariable String commentId) {
         try {
             CommentDB comment = commentRepository.findById(commentId)
                     .orElseThrow(() -> new RuntimeException("Комментарий не найден"));
-
             commentRepository.delete(comment);
 
             Map<String, String> response = new HashMap<>();
@@ -155,7 +209,6 @@ public class CommentController {
         }
     }
 
-    // 6. ПОЛУЧИТЬ КОММЕНТАРИЙ ПО ID
     @GetMapping("/{commentId}")
     public ResponseEntity<?> getCommentById(@PathVariable String commentId) {
         try {
@@ -168,7 +221,6 @@ public class CommentController {
         }
     }
 
-    // 7. ПОЛУЧИТЬ ВСЕ КОММЕНТАРИИ ПОЛЬЗОВАТЕЛЯ
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getCommentsByUser(@PathVariable String userId) {
         try {
@@ -182,7 +234,6 @@ public class CommentController {
         }
     }
 
-    // 8. ПОЛУЧИТЬ КОЛИЧЕСТВО КОММЕНТАРИЕВ У КОМИКСА
     @GetMapping("/comic/{comicId}/count")
     public ResponseEntity<?> getCommentCount(@PathVariable String comicId) {
         try {

@@ -1,45 +1,39 @@
-package org.example.comicsite.model;  // <-- В папку model, не controller!
+package org.example.comicsite.model;
 
 import org.example.comicsite.controller.CommentReply;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "comments")  //Аннотация
+@Document(collection = "comments")
 public class CommentDB {
 
     @Id
     private String id;
+    private String userId;
+    private String userName;
+    private String userAvatar;
+    private String comicId;
+    private String comicTitle;
+    private String comicPageUrl;
+    private String content;
+    private int likes;
+    private int dislikes;
 
-    // Связь с пользователем
-    private String userId;           // ID пользователя (FK)
-    private String userName;         // Имя пользователя (для быстрого отображения)
-    private String userAvatar;       // Аватар пользователя (опционально)
+    // Храним ID пользователей, которые поставили лайк/дизлайк
+    private List<String> likedBy;
+    private List<String> dislikedBy;
 
-    // Связь с комиксом
-    private String comicId;          // ID комикса (FK)
-    private String comicTitle;       // Название комикса (для быстрого отображения)
-    private String comicPageUrl;     // Ссылка на страницу комикса
+    // Временное поле для фронтенда (не сохраняется в БД)
+    private transient String userReaction;  // "like", "dislike", или "none"
 
-    // Содержание комментария
-    private String content;          // Текст комментария
+    private List<CommentReply> replies;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private boolean isEdited;
 
-    // Статистика
-    private int likes;               // Количество лайков
-    private int dislikes;            // Количество дизлайков
-
-    // Вложенные комментарии (ответы)
-    private List<CommentReply> replies;  // Ответы на комментарий
-
-    // Метаданные
-    private LocalDateTime createdAt;     // Дата создания
-    private LocalDateTime updatedAt;     // Дата последнего обновления
-    private boolean isEdited;            // Был ли отредактирован
-
-    // Конструктор
     public CommentDB() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
@@ -47,6 +41,9 @@ public class CommentDB {
         this.dislikes = 0;
         this.isEdited = false;
         this.replies = new ArrayList<>();
+        this.likedBy = new ArrayList<>();
+        this.dislikedBy = new ArrayList<>();
+        this.userReaction = "none";
     }
 
     // Геттеры и сеттеры
@@ -79,6 +76,15 @@ public class CommentDB {
 
     public int getDislikes() { return dislikes; }
     public void setDislikes(int dislikes) { this.dislikes = dislikes; }
+
+    public List<String> getLikedBy() { return likedBy; }
+    public void setLikedBy(List<String> likedBy) { this.likedBy = likedBy; }
+
+    public List<String> getDislikedBy() { return dislikedBy; }
+    public void setDislikedBy(List<String> dislikedBy) { this.dislikedBy = dislikedBy; }
+
+    public String getUserReaction() { return userReaction; }
+    public void setUserReaction(String userReaction) { this.userReaction = userReaction; }
 
     public List<CommentReply> getReplies() { return replies; }
     public void setReplies(List<CommentReply> replies) { this.replies = replies; }
