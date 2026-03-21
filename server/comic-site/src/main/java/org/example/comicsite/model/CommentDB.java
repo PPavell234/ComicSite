@@ -1,11 +1,14 @@
-package org.example.comicsite.controller;
+package org.example.comicsite.model;  // <-- В папку model, не controller!
 
+import org.example.comicsite.controller.CommentReply;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Document(collection = "comments")  //Аннотация
 public class CommentDB {
 
     @Id

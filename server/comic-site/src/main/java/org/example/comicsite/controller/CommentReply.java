@@ -3,21 +3,17 @@ package org.example.comicsite.controller;
 import java.time.LocalDateTime;
 
 public class CommentReply {
-
     private String id;
-    private String userId;           // ID пользователя, который ответил
-    private String userName;         // Имя пользователя
-    private String userAvatar;       // Аватар пользователя
-    private String content;          // Текст ответа
-    private int likes;               // Количество лайков
-    private int dislikes;            // Количество дизлайков
-    private LocalDateTime createdAt; // Дата создания
-    private LocalDateTime updatedAt; // Дата обновления
+    private String userId;
+    private String userName;
+    private String content;
+    private int likes;
+    private int dislikes;
+    private LocalDateTime createdAt;
 
     public CommentReply() {
         this.id = java.util.UUID.randomUUID().toString();
         this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
         this.likes = 0;
         this.dislikes = 0;
     }
@@ -32,9 +28,6 @@ public class CommentReply {
     public String getUserName() { return userName; }
     public void setUserName(String userName) { this.userName = userName; }
 
-    public String getUserAvatar() { return userAvatar; }
-    public void setUserAvatar(String userAvatar) { this.userAvatar = userAvatar; }
-
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
 
@@ -46,7 +39,4 @@ public class CommentReply {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }
