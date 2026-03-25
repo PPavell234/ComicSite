@@ -25,15 +25,78 @@
 
         <NewsP></NewsP>
 
-        <!-- Пустое пространство-->
-        <div class="h-[25px] flex items-center justify-start mx-auto pl-23 gap-12"></div>
+        <!-- Лист 2 с комиксами - ЗАГРУЗКА ИЗ БД -->
+        <div class="bg-[#353333] text-white flex items-start justify-start pl-5 pt-7 max-w-[720px] mx-auto">
+            <ul>
+                <li class="flex items-center space-x-2">
+                    <p>Послденее</p>
+                    <img src="/comicP/IconBack.svg" alt="" class="w-3 h-3 rotate-180">
 
+                </li>
+            </ul>
+        </div>
 
+        <!-- Грид для комиксов -->
+        <div class="bg-[#353333] max-w-[720px] mx-auto pt-8 pb-12">
+            <div v-if="loading" class="grid grid-cols-3 gap-12 justify-items-center">
+                <div v-for="n in 6" :key="n" class="animate-pulse">
+                    <div class="w-[170px] h-[250px] bg-gray-600 rounded"></div>
+                    <div class="w-[140px] h-4 bg-gray-600 mt-2 rounded"></div>
+                </div>
+            </div>
+
+            <div v-else>
+                <!-- Группируем комиксы по 3 -->
+                <template v-for="(group, groupIndex) in groupedComics" :key="groupIndex">
+                    <div class="grid grid-cols-3 gap-12 justify-items-center">
+                        <comic-title v-for="comic in group" :key="comic.id" :title="comic.title"
+                            :chapter="getLatestChapter(comic)" :bg="getCoverUrl(comic)" :favorite="isFavorite(comic.id)"
+                            :comic-id="comic.id" @click="goToComic(comic.id)" @toggle-favorite="toggleFavorite" />
+                    </div>
+                    <!-- Полоска между рядами (кроме последнего) -->
+                    <div v-if="groupIndex < groupedComics.length - 1" class="h-1 bg-[#2C2B2B] mt-8 mb-8"></div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Лист 3 с комиксами - ЗАГРУЗКА ИЗ БД -->
+        <div class="bg-[#353333] text-white flex items-start justify-start pl-5 pt-7 max-w-[720px] mx-auto">
+            <ul>
+                <li class="flex items-center space-x-2">
+                    <p>Послденее</p>
+                    <img src="/comicP/IconBack.svg" alt="" class="w-3 h-3 rotate-180">
+
+                </li>
+            </ul>
+        </div>
+
+        <!-- Грид для комиксов -->
+        <div class="bg-[#353333] max-w-[720px] mx-auto pt-8 pb-12">
+            <div v-if="loading" class="grid grid-cols-3 gap-12 justify-items-center">
+                <div v-for="n in 6" :key="n" class="animate-pulse">
+                    <div class="w-[170px] h-[250px] bg-gray-600 rounded"></div>
+                    <div class="w-[140px] h-4 bg-gray-600 mt-2 rounded"></div>
+                </div>
+            </div>
+
+            <div v-else>
+                <!-- Группируем комиксы по 3 -->
+                <template v-for="(group, groupIndex) in groupedComics" :key="groupIndex">
+                    <div class="grid grid-cols-3 gap-12 justify-items-center">
+                        <comic-title v-for="comic in group" :key="comic.id" :title="comic.title"
+                            :chapter="getLatestChapter(comic)" :bg="getCoverUrl(comic)" :favorite="isFavorite(comic.id)"
+                            :comic-id="comic.id" @click="goToComic(comic.id)" @toggle-favorite="toggleFavorite" />
+                    </div>
+                    <!-- Полоска между рядами (кроме последнего) -->
+                    <div v-if="groupIndex < groupedComics.length - 1" class="h-1 bg-[#2C2B2B] mt-8 mb-8"></div>
+                </template>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'  // <-- ДОБАВИЛИ computed
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import HeaderMenu from '../components/Page/headerMenu.vue'
@@ -45,6 +108,15 @@ const comics = ref([])
 const loading = ref(true)
 const favorites = ref(new Set())
 let refreshInterval = null
+
+// Вычисляемое свойство для группировки комиксов по 3
+const groupedComics = computed(() => {
+    const result = []
+    for (let i = 0; i < comics.value.length; i += 3) {
+        result.push(comics.value.slice(i, i + 3))
+    }
+    return result
+})
 
 // Загрузка комиксов из MongoDB
 const fetchComics = async () => {
@@ -84,7 +156,7 @@ const isFavorite = (comicId) => {
 // Переход на страницу комикса
 const goToComic = (comicId) => {
     console.log('Переход к комиксу с ID:', comicId)
-    router.push(`/comic/${comicId}/read`)  // Переход на страницу чтения
+    router.push(`/comic/${comicId}/read`)
 }
 
 // Загрузка избранного
