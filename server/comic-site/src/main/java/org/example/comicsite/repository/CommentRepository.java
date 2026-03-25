@@ -8,15 +8,13 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends MongoRepository<CommentDB, String> {
 
-    // Найти все комментарии по ID комикса (сортировка по дате)
+    // Поиск по комиксу и странице
+    List<CommentDB> findByComicIdAndPageNumberOrderByCreatedAtDesc(String comicId, int pageNumber);
+
+    // Поиск только по комиксу (для совместимости)
     List<CommentDB> findByComicIdOrderByCreatedAtDesc(String comicId);
 
-    // Найти все комментарии по ID комикса
-    List<CommentDB> findByComicId(String comicId);
-
-    // Найти все комментарии по ID пользователя
     List<CommentDB> findByUserId(String userId);
 
-    // Подсчитать количество комментариев у комикса
     long countByComicId(String comicId);
 }

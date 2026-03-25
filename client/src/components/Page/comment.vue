@@ -14,6 +14,8 @@
                 </div>
             </div>
 
+
+
             <!-- Список комментариев -->
             <div v-if="comments.length > 0">
                 <div v-for="comment in comments" :key="comment.id" class="mt-6">
@@ -64,18 +66,16 @@
                             </div>
                         </div>
 
-                        <!-- Правая часть: лайки с активным состоянием -->
+                        <!-- Правая часть: лайки -->
                         <div class="flex gap-4 mr-12">
                             <div class="flex flex-col items-center gap-1 cursor-pointer hover:scale-110 transition"
-                                :class="{ 'opacity-50': comment.userDisliked }" @click="addReaction(comment.id, false)">
-                                <img src="/comicP/dislike.svg" alt="" class="w-6 h-6"
-                                    :class="{ 'filter brightness-0 invert-1': comment.userDisliked }">
+                                @click="addReaction(comment.id, false)">
+                                <img src="/comicP/dislike.svg" alt="" class="w-6 h-6">
                                 <p class="text-sm">{{ comment.dislikes || 0 }}</p>
                             </div>
                             <div class="flex flex-col items-center gap-1 cursor-pointer hover:scale-110 transition"
-                                :class="{ 'opacity-50': comment.userLiked }" @click="addReaction(comment.id, true)">
-                                <img src="/comicP/like.svg" alt="" class="w-6 h-6"
-                                    :class="{ 'filter brightness-0 invert-1': comment.userLiked }">
+                                @click="addReaction(comment.id, true)">
+                                <img src="/comicP/like.svg" alt="" class="w-6 h-6">
                                 <p class="text-sm">{{ comment.likes || 0 }}</p>
                             </div>
                         </div>
@@ -83,11 +83,15 @@
                 </div>
             </div>
 
-            <div v-else class="text-center text-gray-500 mt-12">
-                Пока нет комментариев. Будьте первым!
+            <div v-else-if="!loading" class="text-center text-gray-500 mt-12">
+                Пока нет комментариев на этой странице. Будьте первым!
             </div>
 
-            <div v-if="hasMoreComments" class="mt-8 pb-12">
+            <div v-if="loading" class="text-center text-white mt-12">
+                Загрузка комментариев...
+            </div>
+
+            <div v-if="hasMoreComments && !loading" class="mt-8 pb-12">
                 <div @click="loadMoreComments"
                     class="bg-[#353333] p-3 mr-12 ml-12 text-white text-center cursor-pointer hover:bg-gray-600 transition">
                     Еще комментарии
@@ -107,6 +111,10 @@ export default {
         comicId: {
             type: String,
             required: true
+        },
+        pageNumber: {
+            type: Number,
+            default: 1
         }
     },
     data() {
@@ -122,21 +130,31 @@ export default {
         }
     },
     mounted() {
-        // Получаем или создаем ID пользователя для localStorage
+        console.log('=== COMMENTS MOUNTED ===')
+        console.log('comicId:', this.comicId)
+        console.log('pageNumber:', this.pageNumber)
+
         this.userId = localStorage.getItem('commentUserId')
         if (!this.userId) {
             this.userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
             localStorage.setItem('commentUserId', this.userId)
         }
+        console.log('userId:', this.userId)
+
         this.loadComments()
     },
     watch: {
-        comicId(newId) {
-            if (newId) {
-                this.comments = []
-                this.currentPage = 0
-                this.loadComments()
-            }
+        comicId(newVal, oldVal) {
+            console.log('comicId changed:', oldVal, '->', newVal)
+            this.comments = []
+            this.currentPage = 0
+            this.loadComments()
+        },
+        pageNumber(newVal, oldVal) {
+            console.log('pageNumber changed:', oldVal, '->', newVal)
+            this.comments = []
+            this.currentPage = 0
+            this.loadComments()
         }
     },
     methods: {
@@ -160,11 +178,21 @@ export default {
             this.loading = true
 
             try {
-                const response = await axios.get(`http://localhost:8080/api/comments/comic/${this.comicId}?page=${this.currentPage}&userId=${this.userId}`)
+                const url = `http://localhost:8080/api/comments/comic/${this.comicId}?page=${this.currentPage}&pageNumber=${this.pageNumber}&userId=${this.userId}`
+                console.log('Загрузка комментариев URL:', url)
+
+                const response = await axios.get(url)
+
+                console.log('📥 Ответ сервера:', response.data)
+                console.log('📊 Получено комментариев:', response.data.comments?.length)
+
                 this.comments = [...this.comments, ...(response.data.comments || [])]
                 this.hasMoreComments = response.data.hasMore || false
+
             } catch (error) {
                 console.error('Ошибка загрузки комментариев:', error)
+                console.error('Статус:', error.response?.status)
+                console.error('Данные ошибки:', error.response?.data)
             } finally {
                 this.loading = false
             }
@@ -182,8 +210,14 @@ export default {
             }
 
             try {
+                console.log('📤 Отправка комментария:')
+                console.log('  comicId:', this.comicId)
+                console.log('  pageNumber:', this.pageNumber)
+                console.log('  content:', this.newCommentText)
+
                 const newComment = {
                     comicId: this.comicId,
+                    pageNumber: this.pageNumber,
                     userId: this.userId,
                     userName: 'Читатель_' + this.userId.slice(-6),
                     content: this.newCommentText,
@@ -193,10 +227,15 @@ export default {
                 }
 
                 const response = await axios.post('http://localhost:8080/api/comments/create', newComment)
+                console.log('Комментарий сохранен:', response.data)
+
                 this.comments.unshift(response.data)
                 this.newCommentText = ''
+
             } catch (error) {
                 console.error('Ошибка отправки комментария:', error)
+                console.error('Статус:', error.response?.status)
+                console.error('Данные ошибки:', error.response?.data)
                 alert('Ошибка: ' + (error.response?.data?.error || error.message))
             }
         },
@@ -232,7 +271,6 @@ export default {
                 this.replyText = ''
             } catch (error) {
                 console.error('Ошибка отправки ответа:', error)
-                alert('Ошибка: ' + (error.response?.data?.error || error.message))
             }
         },
 
@@ -249,7 +287,6 @@ export default {
                 }
             } catch (error) {
                 console.error('Ошибка:', error)
-                alert('Ошибка: ' + (error.response?.data?.error || error.message))
             }
         }
     }

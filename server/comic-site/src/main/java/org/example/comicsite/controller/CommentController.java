@@ -21,10 +21,13 @@ public class CommentController {
     public ResponseEntity<?> getCommentsByComic(
             @PathVariable String comicId,
             @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int pageNumber,  // <-- ДОБАВЛЯЕМ номер страницы
             @RequestParam(defaultValue = "") String userId) {
 
         try {
-            List<CommentDB> allComments = commentRepository.findByComicIdOrderByCreatedAtDesc(comicId);
+            // Получаем комментарии для конкретного комикса и страницы
+            List<CommentDB> allComments = commentRepository.findByComicIdAndPageNumberOrderByCreatedAtDesc(comicId, pageNumber);
+
             int start = page * 25;
             int end = Math.min(start + 25, allComments.size());
 
@@ -32,7 +35,6 @@ public class CommentController {
             if (start < allComments.size()) {
                 paginatedComments = allComments.subList(start, end);
 
-                // Для каждого комментария добавляем информацию о реакции текущего пользователя
                 if (!userId.isEmpty()) {
                     for (CommentDB comment : paginatedComments) {
                         String reaction = "none";
@@ -76,6 +78,11 @@ public class CommentController {
 
             if (comment.getReplies() == null) {
                 comment.setReplies(new ArrayList<>());
+            }
+
+            // Если номер страницы не указан, ставим 1
+            if (comment.getPageNumber() <= 0) {
+                comment.setPageNumber(1);
             }
 
             CommentDB saved = commentRepository.save(comment);

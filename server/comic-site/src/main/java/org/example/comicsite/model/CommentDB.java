@@ -16,23 +16,19 @@ public class CommentDB {
     private String userName;
     private String userAvatar;
     private String comicId;
+    private int pageNumber;           // <-- ДОБАВЛЯЕМ НОМЕР СТРАНИЦЫ
     private String comicTitle;
     private String comicPageUrl;
     private String content;
     private int likes;
     private int dislikes;
-
-    // Храним ID пользователей, которые поставили лайк/дизлайк
     private List<String> likedBy;
     private List<String> dislikedBy;
-
-    // Временное поле для фронтенда (не сохраняется в БД)
-    private transient String userReaction;  // "like", "dislike", или "none"
-
     private List<CommentReply> replies;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean isEdited;
+    private transient String userReaction;
 
     public CommentDB() {
         this.createdAt = LocalDateTime.now();
@@ -44,6 +40,7 @@ public class CommentDB {
         this.likedBy = new ArrayList<>();
         this.dislikedBy = new ArrayList<>();
         this.userReaction = "none";
+        this.pageNumber = 1;
     }
 
     // Геттеры и сеттеры
@@ -61,6 +58,9 @@ public class CommentDB {
 
     public String getComicId() { return comicId; }
     public void setComicId(String comicId) { this.comicId = comicId; }
+
+    public int getPageNumber() { return pageNumber; }           // <-- ГЕТТЕР
+    public void setPageNumber(int pageNumber) { this.pageNumber = pageNumber; }  // <-- СЕТТЕР
 
     public String getComicTitle() { return comicTitle; }
     public void setComicTitle(String comicTitle) { this.comicTitle = comicTitle; }
@@ -83,9 +83,6 @@ public class CommentDB {
     public List<String> getDislikedBy() { return dislikedBy; }
     public void setDislikedBy(List<String> dislikedBy) { this.dislikedBy = dislikedBy; }
 
-    public String getUserReaction() { return userReaction; }
-    public void setUserReaction(String userReaction) { this.userReaction = userReaction; }
-
     public List<CommentReply> getReplies() { return replies; }
     public void setReplies(List<CommentReply> replies) { this.replies = replies; }
 
@@ -97,4 +94,7 @@ public class CommentDB {
 
     public boolean isEdited() { return isEdited; }
     public void setEdited(boolean edited) { isEdited = edited; }
+
+    public String getUserReaction() { return userReaction; }
+    public void setUserReaction(String userReaction) { this.userReaction = userReaction; }
 }

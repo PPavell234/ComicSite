@@ -43,7 +43,7 @@
         </div>
 
         <!-- Комментарии - передаем comicId -->
-        <Comment :comicId="comicId" />
+        <Comment :comicId="comicId" :pageNumber="currentPageIndex + 1" />
     </div>
 </template>
 
