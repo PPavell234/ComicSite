@@ -25,13 +25,23 @@
                     </li>
                 </ul>
             </div>
-            <div class="flex flex-row ml-[138px] gap-30">
+            <div class="flex flex-row ml-[100px] gap-9">
                 <ul>
                     <li class="flex items-center space-x-2">
                         <img src="/imagePage/headerMenu/Icon-2.png" alt="" class="w-3 h-3">
                         <p>Заказать комикс</p>
                     </li>
                 </ul>
+
+                <ul>
+                    <button @click="toggleTheme"
+                        class="flex items-center text-white bg-[#353333] py-1 px-2 rounded-full hover:scale-105 transition-all h-8 pr-12">
+                        <img :src="isDarkMode ? '/imagePage/headerMenu/IconNight.svg' : '/imagePage/headerMenu/IconSun.svg'"
+                            alt="theme" class="w-7 h-7 mr-2 transition-all duration-300"
+                            :class="{ 'translate-x-6': isDarkMode }">
+                    </button>
+                </ul>
+
                 <ul>
                     <li class="flex items-center space-x-2">
                         <button
@@ -45,3 +55,41 @@
         </div>
     </div>
 </template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+
+// Состояние темы
+const isDarkMode = ref(false)
+
+// Функция переключения темы
+const toggleTheme = () => {
+    isDarkMode.value = !isDarkMode.value
+
+    // Сохраняем в localStorage
+    localStorage.setItem('theme', isDarkMode.value ? 'dark' : 'light')
+
+    // Применяем тему к body
+    if (isDarkMode.value) {
+        document.documentElement.classList.add('dark')
+    } else {
+        document.documentElement.classList.remove('dark')
+    }
+}
+
+// Загрузка сохраненной темы
+onMounted(() => {
+    const savedTheme = localStorage.getItem('theme')
+    if (savedTheme === 'dark') {
+        isDarkMode.value = true
+        document.documentElement.classList.add('dark')
+    }
+})
+</script>
+
+<style scoped>
+/* Анимация для иконки */
+.translate-x-6 {
+    transform: translateX(1.5rem);
+}
+</style>
