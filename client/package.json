@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "_comment_sync": "Синхронизация маршрутов из router/index.js",
+    "sync": "node scripts/sync-routes.js",
+    "open": "node scripts/open-page.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.1",

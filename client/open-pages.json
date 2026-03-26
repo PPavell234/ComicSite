@@ -1,0 +1,62 @@
+{
+  "headermenu": {
+    "url": "http://localhost:5173/headerMenu",
+    "command": "start http://localhost:5173/headerMenu",
+    "path": "/headerMenu"
+  },
+  "register": {
+    "url": "http://localhost:5173/register",
+    "command": "start http://localhost:5173/register",
+    "path": "/register"
+  },
+  "comicp": {
+    "url": "http://localhost:5173",
+    "command": "start http://localhost:5173",
+    "path": "/"
+  },
+  "mainpage": {
+    "url": "http://localhost:5173/ru",
+    "command": "start http://localhost:5173/ru",
+    "path": "/ru"
+  },
+  "readcomic": {
+    "url": "http://localhost:5173/readComic",
+    "command": "start http://localhost:5173/readComic",
+    "path": "/readComic"
+  },
+  "userlist": {
+    "url": "http://localhost:5173/userList",
+    "command": "start http://localhost:5173/userList",
+    "path": "/userList"
+  },
+  "headermenuf": {
+    "url": "http://localhost:5173/headerMenuf",
+    "command": "start http://localhost:5173/headerMenuf",
+    "path": "/headerMenuf"
+  },
+  "helloworld": {
+    "url": "http://localhost:5173/helloWorld",
+    "command": "start http://localhost:5173/helloWorld",
+    "path": "/helloWorld"
+  },
+  "comictitle": {
+    "url": "http://localhost:5173/title",
+    "command": "start http://localhost:5173/title",
+    "path": "/title"
+  },
+  "newsp": {
+    "url": "http://localhost:5173/news",
+    "command": "start http://localhost:5173/news",
+    "path": "/news"
+  },
+  "comment": {
+    "url": "http://localhost:5173/com",
+    "command": "start http://localhost:5173/com",
+    "path": "/com"
+  },
+  "comicreader": {
+    "url": "http://localhost:5173/comic/69b7ed632bc986693aeb196f/read",
+    "command": "start http://localhost:5173/comic/69b7ed632bc986693aeb196f/read",
+    "path": "/comic/:id/read"
+  }
+}

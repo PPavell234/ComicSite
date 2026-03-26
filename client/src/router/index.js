@@ -11,6 +11,7 @@ import HeaderMenu from "../components/Page/headerMenu.vue";
 import ComicTitle from "../components/Page/comicTitle.vue";
 import NewsP from "../components/Page/newsP.vue";
 import ComicReader from "../components/Page/ComicReader.vue";
+import Register from "../components/Page/register.vue";
 
 const routes = [
   //Комонент
@@ -18,6 +19,11 @@ const routes = [
     path: "/headerMenu",
     name: "headerMenu",
     component: HeaderMenu,
+  },
+  {
+    path: "/register",
+    name: "Register",
+    component: Register,
   },
   {
     path: "/",
