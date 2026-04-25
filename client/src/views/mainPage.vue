@@ -111,47 +111,89 @@
                     </ul>
                 </div>
 
-
-                <!-- Пользователи активные -->
-                <div class="bg-white pl-5 pt-7 pr-5 pb-5">
-                    <div class="space-y-4">
-                        <!-- Первый пользователь (аватар слева, информация справа) -->
-                        <div class="border-gray-600 pb-3">
-                            <div class="flex gap-4">
-                                <!-- Аватар слева -->
-                                <div class="flex-shrink-0">
-                                    <img src="/imagePage/profileIcon/profile1.svg" alt="" class="w-12 h-12">
+                <!-- Пользователи активные (один блок) -->
+                <div class="bg-white p-4 mt-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- Пользователь 1 -->
+                        <div class="flex gap-3 items-center border-b border-gray-200 pb-3">
+                            <img src="/imagePage/profileIcon/profile1.svg" alt="" class="w-10 h-10">
+                            <div class="flex-1">
+                                <div class="flex justify-between">
+                                    <span class="text-black text-sm font-medium">Имя пользователя</span>
+                                    <span class="text-gray-500 text-xs">#123</span>
                                 </div>
+                                <div class="flex justify-between mt-1">
+                                    <span class="text-gray-500 text-xs">Уровень: 12</span>
+                                    <span class="text-gray-500 text-xs">104/287 XP</span>
+                                </div>
+                                <div class="flex gap-1 mt-2">
+                                    <div class="bg-gray-200 rounded-full h-1.5 w-[30px]"></div>
+                                    <div class="bg-gray-200 rounded-full h-1.5 w-[30px]"></div>
+                                    <div class="bg-gray-200 rounded-full h-1.5 w-[30px]"></div>
+                                    <div class="bg-gray-200 rounded-full h-1.5 w-[30px]"></div>
+                                </div>
+                            </div>
+                        </div>
 
-                                <!-- Информация профиля справа -->
-                                <div class="flex-1 max-w-[184px]">
-                                    <!-- Первая строка -->
-                                    <div class="flex items-center justify-between mt-1">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-gray-600 text-xs">Имя пользователя</span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-gray-600 text-xs">#1</span>
-                                        </div>
-                                    </div>
+                        <!-- Пользователь 2 -->
+                        <div class="flex gap-3 items-center border-b border-gray-200 pb-3">
+                            <img src="/imagePage/profileIcon/profile1.svg" alt="" class="w-10 h-10">
+                            <div class="flex-1">
+                                <div class="flex justify-between">
+                                    <span class="text-black text-sm font-medium">Имя пользователя 2</span>
+                                    <span class="text-gray-500 text-xs">#124</span>
+                                </div>
+                                <div class="flex justify-between mt-1">
+                                    <span class="text-gray-500 text-xs">Уровень: 8</span>
+                                    <span class="text-gray-500 text-xs">45/200 XP</span>
+                                </div>
+                                <div class="flex gap-1 mt-2">
+                                    <div class="bg-gray-200 rounded-full h-1.5 w-[30px]"></div>
+                                    <div class="bg-gray-200 rounded-full h-1.5 w-[30px]"></div>
+                                    <div class="bg-gray-200 rounded-full h-1.5 w-[30px]"></div>
+                                    <div class="bg-gray-200 rounded-full h-1.5 w-[30px]"></div>
+                                </div>
+                            </div>
+                        </div>
 
-                                    <!-- Вторая строка - ПРИЖАТА К ПРАВОМУ КРАЮ -->
-                                    <div class="flex items-center justify-between mt-1">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-gray-600 text-xs">Уровень: 12</span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-gray-600 text-xs">104/287 XP</span>
-                                        </div>
-                                    </div>
+                        <!-- Пользователь 3 -->
+                        <div class="flex gap-3 items-center border-b border-gray-200 pb-3">
+                            <img src="/imagePage/profileIcon/profile1.svg" alt="" class="w-10 h-10">
+                            <div class="flex-1">
+                                <div class="flex justify-between">
+                                    <span class="text-black text-sm font-medium">Имя пользователя 3</span>
+                                    <span class="text-gray-500 text-xs">#125</span>
+                                </div>
+                                <div class="flex justify-between mt-1">
+                                    <span class="text-gray-500 text-xs">Уровень: 15</span>
+                                    <span class="text-gray-500 text-xs">230/500 XP</span>
+                                </div>
+                                <div class="flex gap-1 mt-2">
+                                    <div class="bg-gray-200 rounded-full h-1.5 w-[30px]"></div>
+                                    <div class="bg-gray-200 rounded-full h-1.5 w-[30px]"></div>
+                                    <div class="bg-gray-200 rounded-full h-1.5 w-[30px]"></div>
+                                    <div class="bg-gray-200 rounded-full h-1.5 w-[30px]"></div>
+                                </div>
+                            </div>
+                        </div>
 
-                                    <!-- Прогресс бар -->
-                                    <div class="mt-2 flex gap-1">
-                                        <div class="bg-gray-200 rounded-full h-2 w-[40px]"></div>
-                                        <div class="bg-gray-200 rounded-full h-2 w-[40px]"></div>
-                                        <div class="bg-gray-200 rounded-full h-2 w-[40px]"></div>
-                                        <div class="bg-gray-200 rounded-full h-2 w-[40px]"></div>
-                                    </div>
+                        <!-- Пользователь 4 (добавим для заполнения) -->
+                        <div class="flex gap-3 items-center border-b border-gray-200 pb-3">
+                            <img src="/imagePage/profileIcon/profile1.svg" alt="" class="w-10 h-10">
+                            <div class="flex-1">
+                                <div class="flex justify-between">
+                                    <span class="text-black text-sm font-medium">Имя пользователя 4</span>
+                                    <span class="text-gray-500 text-xs">#126</span>
+                                </div>
+                                <div class="flex justify-between mt-1">
+                                    <span class="text-gray-500 text-xs">Уровень: 20</span>
+                                    <span class="text-gray-500 text-xs">500/1000 XP</span>
+                                </div>
+                                <div class="flex gap-1 mt-2">
+                                    <div class="bg-gray-200 rounded-full h-1.5 w-[30px]"></div>
+                                    <div class="bg-gray-200 rounded-full h-1.5 w-[30px]"></div>
+                                    <div class="bg-gray-200 rounded-full h-1.5 w-[30px]"></div>
+                                    <div class="bg-gray-200 rounded-full h-1.5 w-[30px]"></div>
                                 </div>
                             </div>
                         </div>
