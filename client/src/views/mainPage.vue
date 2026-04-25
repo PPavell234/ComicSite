@@ -3,7 +3,7 @@
     <div class="bg-gray-800">
         <HeaderMenu></HeaderMenu>
 
-        <!-- Лист с комиксами - ЗАГРУЗКА ИЗ БД -->
+        <!-- Лист с комиксами - ЗАГРУЗКА ИЗ БД (верхний горизонтальный слайдер) -->
         <div
             class="bg-[#353333] h-[320px] flex items-center justify-start max-w-[1450px] mx-auto pl-23 gap-12 overflow-x-auto">
             <!-- Показываем скелетон во время загрузки -->
@@ -25,71 +25,252 @@
 
         <NewsP></NewsP>
 
-        <!-- Лист 2 с комиксами - ЗАГРУЗКА ИЗ БД -->
-        <div class="bg-[#353333] text-white flex items-start justify-start pl-5 pt-7 max-w-[720px] mx-auto">
-            <ul>
-                <li class="flex items-center space-x-2">
-                    <p>Послденее</p>
-                    <img src="/comicP/IconBack.svg" alt="" class="w-3 h-3 rotate-180">
 
-                </li>
-            </ul>
-        </div>
+        <!-- ДВЕ КОЛОНКИ -->
+        <div class="flex gap-4 max-w-[1450px] mx-auto mt-2">
 
-        <!-- Грид для комиксов -->
-        <div class="bg-[#353333] max-w-[720px] mx-auto pt-8 pb-12">
-            <div v-if="loading" class="grid grid-cols-3 gap-12 justify-items-center">
-                <div v-for="n in 6" :key="n" class="animate-pulse">
-                    <div class="w-[170px] h-[250px] bg-gray-600 rounded"></div>
-                    <div class="w-[140px] h-4 bg-gray-600 mt-2 rounded"></div>
+            <!-- ============ ЛЕВАЯ КОЛОНКА ============ -->
+            <div class="w-[425px] mt-5 flex-shrink-0">
+                <!-- Форум -->
+                <div class="flex items-center justify-between mb-6">
+                    <ul>
+                        <li class="flex items-center space-x-2">
+                            <p class="text-white">Последние темы форума</p>
+                            <img src="/comicP/IconBack.svg" alt="" class="w-3 h-3 rotate-180">
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Список тем -->
+                <div class="bg-white pl-5 pt-7 pr-5 pb-5">
+                    <div class="space-y-4">
+                        <!-- Тема 1 -->
+                        <div class="border-gray-600 pb-3">
+                            <div class="flex items-center justify-between">
+                                <a href="#" class="text-black">Название темы 1</a>
+                                <div class="flex items-center gap-4">
+                                    <div class="flex items-center gap-1">
+                                        <img src="/imagePage/headerMenu/eas.svg" alt="" class="w-4 h-4"
+                                            style="filter: brightness(0) saturate(100%) invert(50%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);">
+                                        <span class="text-gray-400 text-sm">0</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <img src="/imagePage/headerMenu/message.svg" alt="" class="w-4 h-4">
+                                        <span class="text-gray-400 text-sm">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Тема 2 -->
+                        <div class="border-gray-600 pb-3">
+                            <div class="flex items-center justify-between">
+                                <a href="#" class="text-black">Название темы 2</a>
+                                <div class="flex items-center gap-4">
+                                    <div class="flex items-center gap-1">
+                                        <img src="/imagePage/headerMenu/eas.svg" alt="" class="w-4 h-4"
+                                            style="filter: brightness(0) saturate(100%) invert(50%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);">
+                                        <span class="text-gray-400 text-sm">0</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <img src="/imagePage/headerMenu/message.svg" alt="" class="w-4 h-4">
+                                        <span class="text-gray-400 text-sm">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Тема 3 -->
+                        <div class="border-gray-600 pb-3">
+                            <div class="flex items-center justify-between">
+                                <a href="#" class="text-black">Название темы 3</a>
+                                <div class="flex items-center gap-4">
+                                    <div class="flex items-center gap-1">
+                                        <img src="/imagePage/headerMenu/eas.svg" alt="" class="w-4 h-4"
+                                            style="filter: brightness(0) saturate(100%) invert(50%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);">
+                                        <span class="text-gray-400 text-sm">0</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <img src="/imagePage/headerMenu/message.svg" alt="" class="w-4 h-4">
+                                        <span class="text-gray-400 text-sm">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Пользователи активыне -->
+                <div class="flex items-center justify-between mb-6 mt-4">
+                    <ul>
+                        <li class="flex items-center space-x-2">
+                            <p class="text-white">Пользователи активные</p>
+                            <img src="/comicP/IconBack.svg" alt="" class="w-3 h-3 rotate-180">
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Пользователи актинвые -->
+                <div class="bg-white pl-5 pt-7 pr-5 pb-5">
+                    <div class="space-y-4">
+                        <!-- Пользовтели -->
+                        <div class="border-gray-600 pb-3">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <img src="/imagePage/profileIcon/profile1.svg" alt="">
+                                </div>
+                                <!--Информация Профиль -->
+                                <div class="flex items-center">
+                                    <div class="flex items-center gap-4">
+                                        <span>Имя</span>
+                                        <span>#1</span>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        <span>Уровень:12</span>
+                                        <span>104/287</span>
+                                    </div>
+                                    <!--Прогресс Бар -->
+                                    <div>
+                                        <div
+                                            class="absolute -top-1 -right-1 bg rounded-full bg-[#929E9F] w-5 h-5 flex items-center justify-center">
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Топ недели -->
+                <div class="bg-[#353333] rounded-lg p-4 mt-6">
+                    <h3 class="text-white font-bold mb-4 text-lg">Топ недели</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-2 text-white text-sm">
+                            <span class="text-yellow-500 font-bold w-6">1.</span>
+                            <span class="truncate">Название комикса</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-white text-sm">
+                            <span class="text-yellow-500 font-bold w-6">2.</span>
+                            <span class="truncate">Название комикса</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-white text-sm">
+                            <span class="text-yellow-500 font-bold w-6">3.</span>
+                            <span class="truncate">Название комикса</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-white text-sm">
+                            <span class="text-gray-400 w-6">4.</span>
+                            <span class="truncate">Название комикса</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-white text-sm">
+                            <span class="text-gray-400 w-6">5.</span>
+                            <span class="truncate">Название комикса</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Категории -->
+                <div class="bg-[#353333] rounded-lg p-4 mt-6">
+                    <h3 class="text-white font-bold mb-4">Категории</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="#"
+                            class="bg-gray-600 text-white text-xs px-3 py-1 rounded-full hover:bg-yellow-500 transition">Манга</a>
+                        <a href="#"
+                            class="bg-gray-600 text-white text-xs px-3 py-1 rounded-full hover:bg-yellow-500 transition">Манхва</a>
+                        <a href="#"
+                            class="bg-gray-600 text-white text-xs px-3 py-1 rounded-full hover:bg-yellow-500 transition">Комиксы</a>
+                        <a href="#"
+                            class="bg-gray-600 text-white text-xs px-3 py-1 rounded-full hover:bg-yellow-500 transition">Новинки</a>
+                        <a href="#"
+                            class="bg-gray-600 text-white text-xs px-3 py-1 rounded-full hover:bg-yellow-500 transition">Популярное</a>
+                    </div>
                 </div>
             </div>
 
-            <div v-else>
-                <!-- Группируем комиксы по 3 -->
-                <template v-for="(group, groupIndex) in groupedComics" :key="groupIndex">
-                    <div class="grid grid-cols-3 gap-12 justify-items-center">
-                        <comic-title v-for="comic in group" :key="comic.id" :title="comic.title"
-                            :chapter="getLatestChapter(comic)" :bg="getCoverUrl(comic)" :favorite="isFavorite(comic.id)"
-                            :comic-id="comic.id" @click="goToComic(comic.id)" @toggle-favorite="toggleFavorite" />
-                    </div>
-                    <!-- Полоска между рядами (кроме последнего) -->
-                    <div v-if="groupIndex < groupedComics.length - 1" class="h-1 bg-[#2C2B2B] mt-8 mb-8"></div>
-                </template>
-            </div>
-        </div>
-
-        <!-- Лист 3 с комиксами - ЗАГРУЗКА ИЗ БД -->
-        <div class="bg-[#353333] text-white flex items-start justify-start pl-5 pt-7 max-w-[720px] mx-auto">
-            <ul>
-                <li class="flex items-center space-x-2">
-                    <p>Послденее</p>
-                    <img src="/comicP/IconBack.svg" alt="" class="w-3 h-3 rotate-180">
-
-                </li>
-            </ul>
-        </div>
-
-        <!-- Грид для комиксов -->
-        <div class="bg-[#353333] max-w-[720px] mx-auto pt-8 pb-12">
-            <div v-if="loading" class="grid grid-cols-3 gap-12 justify-items-center">
-                <div v-for="n in 6" :key="n" class="animate-pulse">
-                    <div class="w-[170px] h-[250px] bg-gray-600 rounded"></div>
-                    <div class="w-[140px] h-4 bg-gray-600 mt-2 rounded"></div>
+            <!-- ============ ПРАВАЯ КОЛОНКА ============ -->
+            <div class="flex-1">
+                <!-- ЛИСТ 1 - Последнее -->
+                <div class="bg-[#353333] text-white pl-5 pt-7">
+                    <ul>
+                        <li class="flex items-center space-x-2">
+                            <p>Последнее</p>
+                            <img src="/comicP/IconBack.svg" alt="" class="w-3 h-3 rotate-180">
+                        </li>
+                    </ul>
                 </div>
-            </div>
 
-            <div v-else>
-                <!-- Группируем комиксы по 3 -->
-                <template v-for="(group, groupIndex) in groupedComics" :key="groupIndex">
-                    <div class="grid grid-cols-3 gap-12 justify-items-center">
-                        <comic-title v-for="comic in group" :key="comic.id" :title="comic.title"
+                <!-- Грид для первых 3 комиксов -->
+                <div class="bg-[#353333] pt-8 pb-4">
+                    <div v-if="loading" class="grid grid-cols-3 gap-12 justify-items-center">
+                        <div v-for="n in 3" :key="n" class="animate-pulse">
+                            <div class="w-[170px] h-[250px] bg-gray-600 rounded"></div>
+                            <div class="w-[140px] h-4 bg-gray-600 mt-2 rounded"></div>
+                        </div>
+                    </div>
+                    <div v-else class="grid grid-cols-3 gap-12 justify-items-center">
+                        <comic-title v-for="comic in comics.slice(0, 3)" :key="comic.id" :title="comic.title"
                             :chapter="getLatestChapter(comic)" :bg="getCoverUrl(comic)" :favorite="isFavorite(comic.id)"
                             :comic-id="comic.id" @click="goToComic(comic.id)" @toggle-favorite="toggleFavorite" />
                     </div>
-                    <!-- Полоска между рядами (кроме последнего) -->
-                    <div v-if="groupIndex < groupedComics.length - 1" class="h-1 bg-[#2C2B2B] mt-8 mb-8"></div>
-                </template>
+                </div>
+
+                <!-- Полоска -->
+                <div class="h-1 bg-[#2C2B2B]"></div>
+
+                <!-- ЛИСТ 2 - Популярное -->
+                <div class="bg-[#353333] text-white pl-5 pt-7">
+                    <ul>
+                        <li class="flex items-center space-x-2">
+                            <p>Популярное</p>
+                            <img src="/comicP/IconBack.svg" alt="" class="w-3 h-3 rotate-180">
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Грид для следующих 3 комиксов -->
+                <div class="bg-[#353333] pt-8 pb-4">
+                    <div v-if="loading" class="grid grid-cols-3 gap-12 justify-items-center">
+                        <div v-for="n in 3" :key="n" class="animate-pulse">
+                            <div class="w-[170px] h-[250px] bg-gray-600 rounded"></div>
+                            <div class="w-[140px] h-4 bg-gray-600 mt-2 rounded"></div>
+                        </div>
+                    </div>
+                    <div v-else class="grid grid-cols-3 gap-12 justify-items-center">
+                        <comic-title v-for="comic in comics.slice(3, 6)" :key="comic.id" :title="comic.title"
+                            :chapter="getLatestChapter(comic)" :bg="getCoverUrl(comic)" :favorite="isFavorite(comic.id)"
+                            :comic-id="comic.id" @click="goToComic(comic.id)" @toggle-favorite="toggleFavorite" />
+                    </div>
+                </div>
+
+                <!-- Полоска -->
+                <div class="h-1 bg-[#2C2B2B]"></div>
+
+                <!-- ЛИСТ 3 - Новинки -->
+                <div class="bg-[#353333] text-white pl-5 pt-7">
+                    <ul>
+                        <li class="flex items-center space-x-2">
+                            <p>Новинки</p>
+                            <img src="/comicP/IconBack.svg" alt="" class="w-3 h-3 rotate-180">
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Грид для следующих 3 комиксов -->
+                <div class="bg-[#353333] pt-8 pb-4">
+                    <div v-if="loading" class="grid grid-cols-3 gap-12 justify-items-center">
+                        <div v-for="n in 3" :key="n" class="animate-pulse">
+                            <div class="w-[170px] h-[250px] bg-gray-600 rounded"></div>
+                            <div class="w-[140px] h-4 bg-gray-600 mt-2 rounded"></div>
+                        </div>
+                    </div>
+                    <div v-else class="grid grid-cols-3 gap-12 justify-items-center">
+                        <comic-title v-for="comic in comics.slice(6, 9)" :key="comic.id" :title="comic.title"
+                            :chapter="getLatestChapter(comic)" :bg="getCoverUrl(comic)" :favorite="isFavorite(comic.id)"
+                            :comic-id="comic.id" @click="goToComic(comic.id)" @toggle-favorite="toggleFavorite" />
+                    </div>
+                </div>
             </div>
         </div>
     </div>
