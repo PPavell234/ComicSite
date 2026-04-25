@@ -27,7 +27,7 @@
 
 
         <!-- ДВЕ КОЛОНКИ -->
-        <div class="flex gap-4 max-w-[1450px] mx-auto mt-2">
+        <div class="flex  max-w-[1450px] mx-auto mt-2">
 
             <!-- ============ ЛЕВАЯ КОЛОНКА ============ -->
             <div class="w-[425px] mt-5 flex-shrink-0">
@@ -201,7 +201,7 @@
                 </div>
 
                 <!-- Топ недели -->
-                <div class="bg-[#353333] rounded-lg p-4 mt-6">
+                <div class="bg-[#353333] rounded-lg p-4 ">
                     <h3 class="text-white font-bold mb-4 text-lg">Топ недели</h3>
                     <ul class="space-y-3">
                         <li class="flex items-center gap-2 text-white text-sm">
@@ -228,7 +228,7 @@
                 </div>
 
                 <!-- Категории -->
-                <div class="bg-[#353333] rounded-lg p-4 mt-6">
+                <div class="bg-[#353333] rounded-lg p-4 ">
                     <h3 class="text-white font-bold mb-4">Категории</h3>
                     <div class="flex flex-wrap gap-2">
                         <a href="#"
@@ -241,6 +241,13 @@
                             class="bg-gray-600 text-white text-xs px-3 py-1 rounded-full hover:bg-yellow-500 transition">Новинки</a>
                         <a href="#"
                             class="bg-gray-600 text-white text-xs px-3 py-1 rounded-full hover:bg-yellow-500 transition">Популярное</a>
+                    </div>
+                </div>
+
+                <!-- Баннер -->
+                <div class=" rounded-lg p-4 mt-6 ">
+                    <div>
+                        <img src="/imagePage/mainPage/BannerDiscord.svg" alt="">
                     </div>
                 </div>
             </div>
