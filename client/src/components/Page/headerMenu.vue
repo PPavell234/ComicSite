@@ -54,10 +54,10 @@
                 </ul>
 
                 <!-- Если пользователь авторизован - показываем профиль -->
-                <ul v-if="isLoggedIn">
+                <ul v-if="isLoggedIn" class="relative">
                     <li class="flex items-center space-x-2">
-                        <div class="flex items-center space-x-2 gap-2 px-3 py-1 transform scale-88">
-                            <!-- scale-75 = 75% от исходного размера -->
+                        <div @click="toggleProfileMenu"
+                            class="flex items-center space-x-2 gap-2 px-3 py-1 transform scale-88 cursor-pointer">
                             <div class="relative inline-block">
                                 <img src="/imagePage/headerMenu/notifications.svg" alt="" class="w-8 h-8">
                                 <div
@@ -66,13 +66,36 @@
                                 </div>
                             </div>
                             <div class="relative inline-block">
-                                <img src="/imagePage/profileIcon/profile1.svg" alt="" class="w-8 h-8">
+                                <img src="/imagePage/profileIcon/profile1.svg" alt="" class="w-8 h-8 ">
                                 <div
                                     class="absolute -bottom-1 -right-1 bg-green-500 text-white text-[8px] font-bold rounded-full w-3 h-3 flex items-center justify-center">
                                 </div>
                             </div>
                         </div>
                     </li>
+
+                    <!-- Выпадающее меню профиля -->
+                    <div v-if="showProfileMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50">
+                        <div class="p-3 border-b border-gray-200">
+                            <p class="text-black font-semibold">{{ userNickname }}</p>
+                            <p class="text-gray-500 text-sm">Пользователь</p>
+                        </div>
+                        <div class="p-2">
+                            <button @click="goToProfile"
+                                class="w-full text-left px-3 py-2 text-gray-700 hover:bg-gray-100 rounded transition">
+                                Мой профиль
+                            </button>
+                            <button @click="goToSettings"
+                                class="w-full text-left px-3 py-2 text-gray-700 hover:bg-gray-100 rounded transition">
+                                Настройки
+                            </button>
+                            <hr class="my-1">
+                            <button @click="handleLogout"
+                                class="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 rounded transition">
+                                Выйти
+                            </button>
+                        </div>
+                    </div>
                 </ul>
             </div>
         </div>
@@ -80,7 +103,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -92,6 +115,7 @@ const isDarkMode = ref(false)
 const isLoggedIn = ref(false)
 const userNickname = ref('')
 const userAvatar = ref('')
+const showProfileMenu = ref(false)
 
 // Функция переключения темы
 const toggleTheme = () => {
@@ -101,6 +125,18 @@ const toggleTheme = () => {
         document.documentElement.classList.add('dark')
     } else {
         document.documentElement.classList.remove('dark')
+    }
+}
+
+// Переключение меню профиля
+const toggleProfileMenu = () => {
+    showProfileMenu.value = !showProfileMenu.value
+}
+
+// Закрыть меню при клике вне его
+const handleClickOutside = (event) => {
+    if (showProfileMenu.value && !event.target.closest('.relative')) {
+        showProfileMenu.value = false
     }
 }
 
@@ -135,7 +171,20 @@ const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     isLoggedIn.value = false
+    showProfileMenu.value = false
     router.push('/')
+}
+
+// Переход в профиль
+const goToProfile = () => {
+    router.push('/profile')
+    showProfileMenu.value = false
+}
+
+// Переход в настройки
+const goToSettings = () => {
+    router.push('/settings')
+    showProfileMenu.value = false
 }
 
 // Загрузка сохраненной темы и проверка авторизации
@@ -146,6 +195,11 @@ onMounted(() => {
         document.documentElement.classList.add('dark')
     }
     checkAuth()
+    document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+    document.removeEventListener('click', handleClickOutside)
 })
 </script>
 
