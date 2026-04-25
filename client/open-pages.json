@@ -54,6 +54,11 @@
     "command": "start http://localhost:5173/com",
     "path": "/com"
   },
+  "regisrerprof": {
+    "url": "http://localhost:5173/registerProf",
+    "command": "start http://localhost:5173/registerProf",
+    "path": "/registerProf"
+  },
   "comicreader": {
     "url": "http://localhost:5173/comic/69b7ed632bc986693aeb196f/read",
     "command": "start http://localhost:5173/comic/69b7ed632bc986693aeb196f/read",

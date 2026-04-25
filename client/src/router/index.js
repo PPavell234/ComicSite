@@ -12,6 +12,7 @@ import ComicTitle from "../components/Page/comicTitle.vue";
 import NewsP from "../components/Page/newsP.vue";
 import ComicReader from "../components/Page/ComicReader.vue";
 import Register from "../components/Page/register.vue";
+import RegisterProf from "../components/Page/registerProf.vue";
 
 const routes = [
   //Комонент
@@ -76,6 +77,11 @@ const routes = [
     path: "/com",
     name: "Comment",
     component: Comment,
+  },
+  {
+    path: "/registerProf",
+    name: "RegisrerProf",
+    component: RegisterProf,
   },
 ];
 

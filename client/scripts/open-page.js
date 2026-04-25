@@ -45,3 +45,7 @@ if (foundKey && openPages[foundKey]) {
     console.log(`   ${key}`);
   });
 }
+
+//Документация как работать
+//Чтобы открыть пиши npm run open mainPage
+//Чтобы обновить пиши npm run syn
