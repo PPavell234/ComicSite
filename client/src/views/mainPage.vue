@@ -111,34 +111,48 @@
                     </ul>
                 </div>
 
-                <!-- Пользователи актинвые -->
+
+                <!-- Пользователи активные -->
                 <div class="bg-white pl-5 pt-7 pr-5 pb-5">
                     <div class="space-y-4">
-                        <!-- Пользовтели -->
+                        <!-- Первый пользователь (аватар слева, информация справа) -->
                         <div class="border-gray-600 pb-3">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <img src="/imagePage/profileIcon/profile1.svg" alt="">
+                            <div class="flex gap-4">
+                                <!-- Аватар слева -->
+                                <div class="flex-shrink-0">
+                                    <img src="/imagePage/profileIcon/profile1.svg" alt="" class="w-12 h-12">
                                 </div>
-                                <!--Информация Профиль -->
-                                <div class="flex items-center">
-                                    <div class="flex items-center gap-4">
-                                        <span>Имя</span>
-                                        <span>#1</span>
-                                    </div>
-                                    <div class="flex items-center gap-4">
-                                        <span>Уровень:12</span>
-                                        <span>104/287</span>
-                                    </div>
-                                    <!--Прогресс Бар -->
-                                    <div>
-                                        <div
-                                            class="absolute -top-1 -right-1 bg rounded-full bg-[#929E9F] w-5 h-5 flex items-center justify-center">
+
+                                <!-- Информация профиля справа -->
+                                <div class="flex-1 max-w-[184px]">
+                                    <!-- Первая строка -->
+                                    <div class="flex items-center justify-between mt-1">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-gray-600 text-xs">Имя пользователя</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-gray-600 text-xs">#1</span>
                                         </div>
                                     </div>
+
+                                    <!-- Вторая строка - ПРИЖАТА К ПРАВОМУ КРАЮ -->
+                                    <div class="flex items-center justify-between mt-1">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-gray-600 text-xs">Уровень: 12</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-gray-600 text-xs">104/287 XP</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Прогресс бар -->
+                                    <div class="mt-2 flex gap-1">
+                                        <div class="bg-gray-200 rounded-full h-2 w-[40px]"></div>
+                                        <div class="bg-gray-200 rounded-full h-2 w-[40px]"></div>
+                                        <div class="bg-gray-200 rounded-full h-2 w-[40px]"></div>
+                                        <div class="bg-gray-200 rounded-full h-2 w-[40px]"></div>
+                                    </div>
                                 </div>
-
-
                             </div>
                         </div>
                     </div>
