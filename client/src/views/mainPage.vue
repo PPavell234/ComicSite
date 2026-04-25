@@ -265,14 +265,14 @@
                 </div>
 
                 <!-- Грид для первых 3 комиксов -->
-                <div class="bg-[#353333] pt-8 pb-4">
+                <div class="bg-[#353333] pt-8 pb-4 ">
                     <div v-if="loading" class="grid grid-cols-3 gap-12 justify-items-center">
                         <div v-for="n in 3" :key="n" class="animate-pulse">
                             <div class="w-[170px] h-[250px] bg-gray-600 rounded"></div>
                             <div class="w-[140px] h-4 bg-gray-600 mt-2 rounded"></div>
                         </div>
                     </div>
-                    <div v-else class="grid grid-cols-3 gap-12 justify-items-center">
+                    <div v-else class="grid grid-cols-3 gap-12 justify-items-center scale-89">
                         <comic-title v-for="comic in comics.slice(0, 3)" :key="comic.id" :title="comic.title"
                             :chapter="getLatestChapter(comic)" :bg="getCoverUrl(comic)" :favorite="isFavorite(comic.id)"
                             :comic-id="comic.id" @click="goToComic(comic.id)" @toggle-favorite="toggleFavorite" />
@@ -300,7 +300,7 @@
                             <div class="w-[140px] h-4 bg-gray-600 mt-2 rounded"></div>
                         </div>
                     </div>
-                    <div v-else class="grid grid-cols-3 gap-12 justify-items-center">
+                    <div v-else class="grid grid-cols-3 gap-12 justify-items-center scale-89">
                         <comic-title v-for="comic in comics.slice(3, 6)" :key="comic.id" :title="comic.title"
                             :chapter="getLatestChapter(comic)" :bg="getCoverUrl(comic)" :favorite="isFavorite(comic.id)"
                             :comic-id="comic.id" @click="goToComic(comic.id)" @toggle-favorite="toggleFavorite" />
@@ -328,11 +328,81 @@
                             <div class="w-[140px] h-4 bg-gray-600 mt-2 rounded"></div>
                         </div>
                     </div>
-                    <div v-else class="grid grid-cols-3 gap-12 justify-items-center">
+                    <div v-else class="grid grid-cols-3 gap-12 justify-items-center scale-89">
                         <comic-title v-for="comic in comics.slice(6, 9)" :key="comic.id" :title="comic.title"
                             :chapter="getLatestChapter(comic)" :bg="getCoverUrl(comic)" :favorite="isFavorite(comic.id)"
                             :comic-id="comic.id" @click="goToComic(comic.id)" @toggle-favorite="toggleFavorite" />
                     </div>
+                </div>
+            </div>
+            <!-- 3 Колонка -->
+            <div class=" flex-1">
+
+                <!-- ЛИСТ 1 - Последнее -->
+                <div class=" text-white pl-5 pt-7">
+                    <ul>
+                        <li class="flex items-center space-x-2">
+                            <p>Последнее отзывы</p>
+                            <img src="/comicP/IconBack.svg" alt="" class="w-3 h-3 rotate-180">
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Отзывы -->
+                <div class=" pt-8 pb-4 scale-95">
+                    <div class="w-[500px] h-12 overflow-hidden rounded">
+                        <img src="/imagePage/comic-list/Comic.svg" alt=""
+                            class="w-[100%] h-[100%] object-cover object-top">
+                    </div>
+                    <div>
+                        <!---Первая колонка-->
+                        <div>
+
+                        </div>
+                        <div class="bg-white pl-4 pt-3 w-[380px] ">
+                            <div class="flex flex-row gap-5 ">
+                                <div class="gap-2 flex flex-row">
+                                    <img src="/imagePage/button-icon/edit.svg" alt="" class="w-4 h-4">
+                                    <p>Резензия</p>
+                                </div>
+                                <div class="gap-2 flex flex-row">
+                                    <img src="/imagePage/button-icon/notSmile.svg" alt="" class="w-4 h-4">
+                                    <p>Нетральный</p>
+                                </div>
+                            </div>
+                            <div class="mt-10 pl-5 pr-22 ">
+                                <p>Отзыв</p>
+                                <div class="mt-2"></div>
+                                <p>Тут какой-то отзыв
+                                </p>
+                            </div>
+                            <div class="flex flex-row mt-15 pb-5 pr-7 gap-6">
+                                <div></div>
+                                <div class="flex flex-row gap-2">
+                                    <img src="/imagePage/headerMenu/eas.svg" alt="" class="w-4 h-4"
+                                        style="filter: brightness(0) saturate(100%) invert(50%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);">
+                                    <p>153</p>
+                                </div>
+                                <div class="flex flex-row gap-2">
+                                    <img src="/imagePage/button-icon/hot.svg" alt="" class="w-4 h-4"
+                                        style="filter: brightness(0) saturate(100%) invert(50%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);">
+                                    <p>3</p>
+                                </div>
+                                <div class="flex flex-row gap-6 ml-auto">
+                                    <p>5 часов назад</p>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <!-- Картинка поверх блока -->
+                        <div class="ml-70 -mt-70 relative z-10 rotate-25">
+                            <img src="/imagePage/comic-list/Comic.svg" alt="" class="w-60 h-60">
+                        </div>
+
+                    </div>
+
+
                 </div>
             </div>
         </div>
